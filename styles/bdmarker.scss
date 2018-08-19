@@ -1,0 +1,104 @@
+@charset "utf-8";
+
+.annotation {
+  cursor: move;
+  border: 1px solid #3e3e3e;
+  background: rgba(0, 0, 0, 0.3);
+}
+.selected{
+  background: rgba(89, 190, 244, 0.3);
+}
+.hidden{
+  display: none;
+}
+.resize-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgb(255, 255, 255);
+  box-sizing: border-box;
+
+  &-n {
+    position: absolute;
+    cursor: n-resize;
+    top: -4px;
+    left: 50%;
+    margin-left: -4px;
+  }
+
+  &-s {
+    position: absolute;
+    cursor: s-resize;
+    bottom: -4px;
+    left: 50%;
+    margin-left: -4px;
+  }
+
+  &-w {
+    position: absolute;
+    cursor: w-resize;
+    left: -4px;
+    top: 50%;
+    margin-top: -4px;
+  }
+
+  &-e {
+    position: absolute;
+    cursor: e-resize;
+    right: -4px;
+    top: 50%;
+    margin-top: -4px;
+  }
+
+  &-nw {
+    position: absolute;
+    cursor: nw-resize;
+    margin-top: -4px;
+    margin-left: -4px;
+  }
+
+  &-ne {
+    position: absolute;
+    cursor: ne-resize;
+    right: 0;
+    margin-top: -4px;
+    margin-right: -4px;
+  }
+
+  &-sw {
+    position: absolute;
+    cursor: sw-resize;
+    bottom: 0;
+    margin-left: -4px;
+    margin-bottom: -4px;
+  }
+
+  &-se {
+    cursor: se-resize;
+    right: -4px;
+    bottom: 0;
+    margin-bottom: -4px;
+  }
+
+}
+
+
+
+.g-image-op {
+  bottom: 0;
+  cursor: auto;
+  position: absolute;
+}
+.g-image-op-content {
+  background-color: hsla(0,0%,100%,.6);
+  box-sizing: border-box;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+
+.g-image-op-del {
+  cursor: pointer;
+}
