@@ -20,5 +20,10 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "snyk": "^1.91.0"
-  }
+  },
+  "files": [
+    "index.js",
+    "lib",
+    "styles"
+  ]
 }
