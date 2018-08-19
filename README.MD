@@ -1,6 +1,21 @@
 ## 高仿百度AI图像物体检测标注控件
 
-__HTML__ 基本结构
+效果图：
+
+![](./fs.png)
+
+安装依赖
+
+```
+npm install ui-picture-bd-marker -D
+
+```
+
+源码仓库：[https://github.com/FRED5DON/ui-picture-bd-marker](https://github.com/FRED5DON/ui-picture-bd-marker)
+
+
+Vue中使用举例
+
 ---
 
 ```
@@ -19,22 +34,55 @@ __HTML__ 基本结构
       </div>
   </div>
 </template>
+
+<script>
+  import { MUTester } from '../markUii_tester';
+  import 'ui-picture-bd-marker/styles/bdmarker.scss';
+  export default {
+    name: 'HelloWorld',
+    data() {
+      return {
+        msg: 'Welcome to Your Vue.js App',
+        marker: void 0
+      };
+    },
+    mounted() {
+      this.event_on_draw();
+    },
+    methods: {
+      event_on_draw: () => {
+        let mt = new MUTester(void 0);
+        mt.doTest();
+      }
+    }
+  };
+</script>
+
+</template>
+
 ```
 
-__CSS__ 默认样式
----
-见bdmarker.scss
-
-###用法
-
-初始化marker
+此处`markUii_tester `为测试类，内容如下：
 
 ```
-this.marker = mark ? mark :
+'use strict';
+
+import {
+  ResizeAnnotation,
+  BdAIMarker,
+  UUID,
+  positionP2S,
+  transformDataArray,
+} from 'ui-picture-bd-marker';
+
+class MUTester {
+
+  constructor(mark) {
+    this.marker = mark ? mark :
       new BdAIMarker(
         document.querySelector('#annotate-44'),
-        document.querySelector('.draft'),//草稿
-        null,//可自定义画框逻辑
+        document.querySelector('.draft'),
+        null,
         {
           options: {
             blurOtherDots: true,
@@ -48,21 +96,21 @@ this.marker = mark ? mark :
             console.log(data);
           },
         });
-```
-获取数据，设置当前选中的标签
+    window.$marker = this.marker;
+    window.transformDataArray = transformDataArray;
+  }
 
-```
+  doTest = () => {
+    this.test_renderData();
+    setTimeout(() => {
+      this.test_setTag('Fred');
+    }, 2000);
 
-this.marker.dataSource()
+  };
 
-this.marker.setTag(tagString);
-```
 
-渲染数据
-
-```
-
-this.marker.renderData(data ? data : [
+  test_renderData = (data) => {
+    this.marker.renderData(data ? data : [
         {
           tag: 'flower',
           position: {
@@ -84,6 +132,22 @@ this.marker.renderData(data ? data : [
       ],
       { width: 700, height: 437 },
     );
+  };
+
+  test_setTag = (tagString) => {
+    this.marker.setTag(tagString);
+  };
+
+
+  test_getDataset = () => {
+    console.log(this.marker.dataSource());
+  };
+}
+
+export {
+  MUTester,
+};
+
 
 ```
 
