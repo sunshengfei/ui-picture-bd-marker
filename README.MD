@@ -2,7 +2,7 @@
 
 效果图：
 
-![](./fs.png)
+![](https://github.com/FRED5DON/ui-picture-bd-marker/raw/master/fs.png)
 
 安装依赖
 
@@ -96,8 +96,6 @@ class MUTester {
             console.log(data);
           },
         });
-    window.$marker = this.marker;
-    window.transformDataArray = transformDataArray;
   }
 
   doTest = () => {
