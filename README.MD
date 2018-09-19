@@ -2,7 +2,7 @@
 
 效果图：
 
-![](https://github.com/FRED5DON/ui-picture-bd-marker/raw/master/fs.png)
+![](https://github.com/FRED5DON/ui-picture-bd-marker/raw/master/demo.png)
 
 安装依赖
 
@@ -88,6 +88,7 @@ class MUTester {
             blurOtherDots: true,
             blurOtherDotsShowTags: false,
             editable: true,
+            trashPositionStart:1,
           },
           onDataRendered: () => {
             this.test_getDataset();
@@ -110,21 +111,21 @@ class MUTester {
   test_renderData = (data) => {
     this.marker.renderData(data ? data : [
         {
-          tag: 'flower',
+          tag: 'Diamond',
           position: {
-            x: 80,
-            y: 109,
-            x1: 260,
-            y1: 260,
+            x: 350,
+            y: 306,
+            x1: 377,
+            y1: 334,
           },
         },
         {
-          tag: 'purple',
+          tag: 'Bob',
           position: {
-            x: 180,
-            y: 159,
-            x1: 360,
-            y1: 360,
+            x: 30,
+            y: 100,
+            x1: 240,
+            y1: 400,
           },
         },
       ],

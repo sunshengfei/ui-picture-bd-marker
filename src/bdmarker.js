@@ -15,6 +15,7 @@ let options = {
   blurOtherDots: true,
   blurOtherDotsShowTags: false,
   editable: true,
+  trashPositionStart:0
 };
 
 const PREFIX_RESIZE_DOT = 'resize-dot';
@@ -234,7 +235,7 @@ class ResizeAnnotation {
         x: (100 * data.position.x / base.width).toFixed(3) + '%',
         y: (100 * data.position.y / base.height).toFixed(3) + '%',
         width: (100 * (data.position.x1 - data.position.x) / base.width).toFixed(3) + '%',
-        height: (100 * (data.position.y1 - data.position.y) / base.width).toFixed(3) + '%',
+        height: (100 * (data.position.y1 - data.position.y) / base.height).toFixed(3) + '%',
       };
       this.drawAnnotation(rect, data.tag);
     });
@@ -347,8 +348,13 @@ class ResizeAnnotation {
         tag.dataset.tag = dataTag;
         tag.className = 'g-image-op-name';
         tag.innerText = tagString;
-        opContent.appendChild(trash);
-        opContent.appendChild(tag);
+        if(options.trashPositionStart){
+          opContent.appendChild(trash);
+          opContent.appendChild(tag);
+        }else{
+          opContent.appendChild(tag);
+          opContent.appendChild(trash);
+        }
         resizeDot.appendChild(opContent);
       } else {
         resizeDot.className = `${resizeDotClasses[prop]} ${cls[i]} ${options.editable
@@ -557,6 +563,7 @@ class BdAIMarker {
       // }
       if (this.actionDown && this.resizeAnnotation) {
         this.resizeAnnotation.drawAnnotation(this.draftRect);
+        this.resetDraft();
       }
       this.actionDown = false;
     } else {
@@ -565,6 +572,7 @@ class BdAIMarker {
         // console.log(this.draftRect);
         if (this.resizeAnnotation) {
           this.resizeAnnotation.drawAnnotation(this.draftRect);
+          this.resetDraft();
         }
         this.actionDown = false;
       }
