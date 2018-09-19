@@ -2,7 +2,7 @@
 
 效果图：
 
-![](https://github.com/FRED5DON/ui-picture-bd-marker/raw/master/demo.jpeg)
+![](https://github.com/FRED5DON/ui-picture-bd-marker/raw/master/demo.png)
 
 安装依赖
 
