@@ -1,3 +1,5 @@
+import { isArray } from "util";
+
 'use strict';
 
 const MOUSE_EVENT = [
@@ -10,12 +12,12 @@ const MOUSE_EVENT = [
 ];
 let drawCursorEvent = MOUSE_EVENT;
 let eventTargetOnTransform = false;
-
+const imageOpTag='g-image-op-name'
 let options = {
   blurOtherDots: true,
   blurOtherDotsShowTags: false,
   editable: true,
-  trashPositionStart:0
+  trashPositionStart: 0
 };
 
 const PREFIX_RESIZE_DOT = 'resize-dot';
@@ -191,8 +193,9 @@ class ResizeAnnotation {
 
   static defaultConfig = {
     options: {},
-    onDataRendered: function () {},
-    onUpdated: function () {},
+    onDataRendered: function () { },
+    onUpdated: function () { },
+    onDrawOne: function () { },
   };
 
   constructor(parentNode, boundRect, callback = ResizeAnnotation.defaultConfig) {
@@ -222,6 +225,9 @@ class ResizeAnnotation {
     };
   };
 
+  reset = () => {
+    this.data = []
+  }
 
   isValid = (rect) => {
     return rect && parseFloat(rect.width) > 1 && parseFloat(rect.height) > 1;
@@ -229,16 +235,20 @@ class ResizeAnnotation {
 
   renderData = (
     dataArray = [], base = { width: this.boundRect.width, height: this.boundRect.height }) => {
-    dataArray.forEach((data, index, arr) => {
-      //currentValue => rect
-      let rect = {
-        x: (100 * data.position.x / base.width).toFixed(3) + '%',
-        y: (100 * data.position.y / base.height).toFixed(3) + '%',
-        width: (100 * (data.position.x1 - data.position.x) / base.width).toFixed(3) + '%',
-        height: (100 * (data.position.y1 - data.position.y) / base.height).toFixed(3) + '%',
-      };
-      this.drawAnnotation(rect, data.tag);
-    });
+    if ( dataArray instanceof Array && dataArray.length > 0) {
+      dataArray.forEach((data, index, arr) => {
+        //currentValue => rect
+        let rect = {
+          x: (100 * data.position.x / base.width).toFixed(3) + '%',
+          y: (100 * data.position.y / base.height).toFixed(3) + '%',
+          width: (100 * (data.position.x1 - data.position.x) / base.width).toFixed(3) + '%',
+          height: (100 * (data.position.y1 - data.position.y) / base.height).toFixed(3) + '%',
+        };
+        this.drawAnnotation(rect, data.tag);
+      });
+    } else {
+      this.reset();
+    }
     this.callback.onDataRendered();
   };
 
@@ -250,13 +260,13 @@ class ResizeAnnotation {
   setTagForCurrentMovement = (tagString = '') => {
     if (this.currentMovement) {
       const node = this.currentMovement.moveNode;
-      node.querySelector('.g-image-op-name').innerText = tagString;
-      const tag = node.querySelector('.g-image-op-name').dataset.tag;
+      node.querySelector(`.${imageOpTag}`).innerText = tagString;
+      const tag = node.querySelector(`.${imageOpTag}`).dataset.tag;
       for (let i = 0; i < this.data.length; i++) {
         let value = this.data[i];
         if (value.tag === tag) {
           value.tag = tagString;
-          node.querySelector('.g-image-op-name').dataset.tag = tagString;
+          node.querySelector(`.${imageOpTag}`).dataset.tag = tagString;
         }
         this.data[i] = value;
       }
@@ -267,7 +277,7 @@ class ResizeAnnotation {
   updateMovementData = () => {
     //获取tag
     const node = this.currentMovement.moveNode;
-    const tag = node.querySelector('.g-image-op-name').dataset.tag;
+    const tag = node.querySelector(`.${imageOpTag}`).dataset.tag;
     let position = {
       x: node.style.left,
       y: node.style.top,
@@ -282,7 +292,7 @@ class ResizeAnnotation {
       }
       this.data[i] = value;
     }
-    this.callback.onUpdated(this.dataSource());
+    this.callback.onUpdated(this.dataSource(),this.currentMovement);
   };
 
 
@@ -290,7 +300,7 @@ class ResizeAnnotation {
     if (!options.editable) return;
     if (this.currentMovement) {
       const node = this.currentMovement.moveNode;
-      const tag = node.querySelector('.g-image-op-name').dataset.tag;
+      const tag = node.querySelector(`.${imageOpTag}`).dataset.tag;
       for (let i = 0; i < this.data.length; i++) {
         let value = this.data[i];
         if (value.tag === tag) {
@@ -304,7 +314,7 @@ class ResizeAnnotation {
     // e.parentNode.parentNode.removeFromParent();
   };
 
-//init
+  //init
   drawAnnotation = (rect, tagText = void 0) => {
     if (!this.isValid(rect)) return;
     this.removeSelectedAnnotation();
@@ -346,12 +356,12 @@ class ResizeAnnotation {
         trash.addEventListener('click', this.removeAnnotationEvent, true);
         let tag = document.createElement('span');
         tag.dataset.tag = dataTag;
-        tag.className = 'g-image-op-name';
+        tag.className = `${imageOpTag}`;
         tag.innerText = tagString;
-        if(options.trashPositionStart){
+        if (options.trashPositionStart) {
           opContent.appendChild(trash);
           opContent.appendChild(tag);
-        }else{
+        } else {
           opContent.appendChild(tag);
           opContent.appendChild(trash);
         }
@@ -368,10 +378,12 @@ class ResizeAnnotation {
     this.annotationContainer.appendChild(annotation);
     this.currentMovement = new Movement(annotation, 0, this.boundRect);
     this.selectAnnotation();
-    this.data.push(this.dataTemplate(dataTag, rect.x, rect.y,
+    let dts=this.dataTemplate(dataTag, rect.x, rect.y,
       parseFloat(rect.x) + parseFloat(rect.width) + '%',
-      parseFloat(rect.y) + parseFloat(rect.height) + '%'));
+      parseFloat(rect.y) + parseFloat(rect.height) + '%')
+    this.data.push(dts);
     this.callback.onUpdated(this.dataSource());
+    this.callback.onDrawOne(dts,this.currentMovement)
   };
 
   dragEventOn = (e) => {
@@ -507,6 +519,7 @@ class BdAIMarker {
       throw 'Please provide a callback Config for BdAIMarker';
     }
     if (layer) {
+      this.layer = layer;
       this.draft = draft;
       this.actionDown = false;
       this.draftRect = {};
@@ -580,7 +593,7 @@ class BdAIMarker {
   };
 
 
-//  更新定位点
+  //  更新定位点
   anchorAt = (x, y) => {
     if (!options.editable) return;
     this.draft.style.display = '';
@@ -632,6 +645,14 @@ class BdAIMarker {
     this.draftRect = { x: -1, y: -1, width: 0, height: 0 };
     this.draft.style.width = '0%';
     this.draft.style.height = '0%';
+  };
+
+  clearAll = () => {
+    let annotations = this.layer.querySelectorAll('div.annotation');
+    annotations.forEach((item) => {
+      item.remove()
+    })
+    this.renderData(void 0)
   };
 
   dragTo = (x, y) => {
