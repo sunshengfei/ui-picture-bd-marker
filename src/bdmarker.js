@@ -363,7 +363,7 @@ class ResizeAnnotation {
     let i = 0;
     let tagString,tagId;
     if(typeof tag ==='object'){
-      tagString=tagText.name;
+      tagString=tag.name;
       tagId=tag.id;
     }
     else if(typeof tag ==='string'){
