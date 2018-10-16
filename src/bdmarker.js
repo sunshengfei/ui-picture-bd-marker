@@ -13,7 +13,7 @@ const MOUSE_EVENT = [
 ];
 let drawCursorEvent = MOUSE_EVENT;
 let eventTargetOnTransform = false;
-const imageOpTag='g-image-op-name'
+const imageOpTag = 'g-image-op-name'
 let options = {
   blurOtherDots: true,
   blurOtherDotsShowTags: false,
@@ -211,12 +211,12 @@ class ResizeAnnotation {
   }
 
   //获取数据模板
-  dataTemplate = (tag, x, y, x1, y1) => {
+  dataTemplate = (tag, tagName, x, y, x1, y1) => {
     if (!tag || !/^.+$/gi.test(tag)) {
       tag = `temp@${new Date().getTime()}`;
     }
     return {
-      tag: tag,
+      ...tag,
       position: {
         x,
         y,
@@ -236,7 +236,7 @@ class ResizeAnnotation {
 
   renderData = (
     dataArray = [], base = { width: this.boundRect.width, height: this.boundRect.height }) => {
-    if ( dataArray instanceof Array && dataArray.length > 0) {
+    if (dataArray instanceof Array && dataArray.length > 0) {
       dataArray.forEach((data, index, arr) => {
         //currentValue => rect
         let rect = {
@@ -245,7 +245,7 @@ class ResizeAnnotation {
           width: (100 * (data.position.x1 - data.position.x) / base.width).toFixed(3) + '%',
           height: (100 * (data.position.y1 - data.position.y) / base.height).toFixed(3) + '%',
         };
-        this.drawAnnotation(rect, data.tag);
+        this.drawAnnotation(rect, data);
       });
     } else {
       this.reset();
@@ -268,25 +268,29 @@ class ResizeAnnotation {
   };
 
 
-  setTagForCurrentMovement = (tagString) => {
-    let tag_str='',tag_id='';
-    if(typeof tagString ==='string'){
-      tag_id=tag_str=tagString;
-    }
-    if(typeof tagString ==='object'){
-      tag_str=tagString['name']
-      tag_id=tagString['id']
-    }
+  setTagForCurrentMovement = (tagOb) => {
     if (this.currentMovement) {
       const node = this.currentMovement.moveNode;
+      let tag_str = '', tag_id = '';
+      if (typeof tagOb === 'string') {
+        tag_id = tag_str = tagOb;
+      }
+      const oldtag = node.querySelector(`.${imageOpTag}`).dataset.id;
+      if (typeof tagOb === 'object') {
+        tag_str = tagOb['tagName']
+        tag_id = tagOb['tag']
+        for (let k in tagOb) {
+          node.querySelector(`.${imageOpTag}`).dataset[k] = tagOb[k];
+        }
+      }
       node.querySelector(`.${imageOpTag}`).innerText = tag_str;
-      node.querySelector(`.${imageOpTag}`).setAttribute('data-id',tag_id);
-      const tag = node.querySelector(`.${imageOpTag}`).dataset.tag;
       for (let i = 0; i < this.data.length; i++) {
         let value = this.data[i];
-        if (value.tag === tag) {
+        if (value.tag === oldtag) {
           value.tag = tag_id;
-          node.querySelector(`.${imageOpTag}`).dataset.tag = tag_id;
+          value.tagName = tag_str;
+          node.querySelector(`.${imageOpTag}`).dataset.id = tag_id;
+          node.querySelector(`.${imageOpTag}`).dataset.name = tag_str;
         }
         this.data[i] = value;
       }
@@ -296,9 +300,9 @@ class ResizeAnnotation {
 
   updateMovementData = () => {
     //获取tag
-    if(this.currentMovement==null)return;
+    if (this.currentMovement == null) return;
     const node = this.currentMovement.moveNode;
-    const tag = node.querySelector(`.${imageOpTag}`).dataset.tag;
+    const tag = node.querySelector(`.${imageOpTag}`).dataset.id;
     let position = {
       x: node.style.left,
       y: node.style.top,
@@ -313,7 +317,7 @@ class ResizeAnnotation {
       }
       this.data[i] = value;
     }
-    this.callback.onUpdated(this.dataSource(),this.currentMovement);
+    this.callback.onUpdated(this.dataSource(), this.currentMovement);
   };
 
 
@@ -321,7 +325,7 @@ class ResizeAnnotation {
     if (!options.editable) return;
     if (this.currentMovement) {
       const node = this.currentMovement.moveNode;
-      const tag = node.querySelector(`.${imageOpTag}`).dataset.tag;
+      const tag = node.querySelector(`.${imageOpTag}`).dataset.id;
       for (let i = 0; i < this.data.length; i++) {
         let value = this.data[i];
         if (value.tag === tag) {
@@ -361,17 +365,17 @@ class ResizeAnnotation {
     };
     // this.callback
     let i = 0;
-    let tagString,tagId;
-    if(typeof tag ==='object'){
-      tagString=tag.name;
-      tagId=tag.id;
+    let tagString, tagId;
+    if (typeof tag === 'object') {
+      tagString = tag.tagName;
+      tagId = tag.tag;
     }
-    else if(typeof tag ==='string'){
-      tagString=tag;
-      tagId=tag;
-    }else{
-      tagString='请选择或添加新标签';
-      tagId=`temp@${UUID(16, 16)}`;
+    else if (typeof tag === 'string') {
+      tagString = tag;
+      tagId = tag;
+    } else {
+      tagString = '请选择或添加新标签';
+      tagId = `temp@${UUID(16, 16)}`;
     }
     for (let prop in resizeDotClasses) {
       let resizeDot = document.createElement('div');
@@ -386,10 +390,10 @@ class ResizeAnnotation {
         trash.innerText = ' × ';
         trash.addEventListener('click', this.removeAnnotationEvent, true);
         let tag = document.createElement('span');
-        tag.dataset.tag = tagId;
+        tag.dataset.name = tagString;
         tag.className = `${imageOpTag}`;
         tag.innerText = tagString;
-        tag.setAttribute('data-id',tagId);
+        tag.dataset.id = tagId;
         if (options.trashPositionStart) {
           opContent.appendChild(trash);
           opContent.appendChild(tag);
@@ -410,7 +414,7 @@ class ResizeAnnotation {
     this.annotationContainer.appendChild(annotation);
     this.currentMovement = new Movement(annotation, 0, this.boundRect);
     // this.selectAnnotation();
-    let dts=this.dataTemplate(tagId, rect.x, rect.y,
+    let dts = this.dataTemplate(tag, rect.x, rect.y,
       parseFloat(rect.x) + parseFloat(rect.width) + '%',
       parseFloat(rect.y) + parseFloat(rect.height) + '%')
     this.data.push(dts);
@@ -445,8 +449,8 @@ class ResizeAnnotation {
       }
     } else {
       if (this.actionDown) {
-          this.updateMovementData();
-          this.selectAnnotation();
+        this.updateMovementData();
+        this.selectAnnotation();
       }
       this.actionDown = false;
       eventTargetOnTransform = false;
@@ -467,7 +471,7 @@ class ResizeAnnotation {
     }
   };
 
-  selectAnnotation = () => {
+  selectAnnotation = (isUserinteracted=true) => {
     if (this.currentMovement) {
       let cs = this.currentMovement.moveNode.classList;
       cs.add('selected');
@@ -488,15 +492,27 @@ class ResizeAnnotation {
             node.classList.remove('hidden');
           });
       }
+      if(!isUserinteracted)return;
       const node = this.currentMovement.moveNode;
-      const tag_str=node.querySelector(`.${imageOpTag}`).innerText;
-      const tag_id=node.querySelector(`.${imageOpTag}`).getAttribute('data-id');
+      const tag_str = node.querySelector(`.${imageOpTag}`).innerText;
+      const tagAttr = node.querySelector(`.${imageOpTag}`).dataset;
       this.callback.onSelect({
-        name:tag_str,
-          ...this.dataSourceOfTag(tag_id)
+        ...tagAttr,
+        ...this.dataSourceOfTag(tagAttr.id)
       })
     }
   };
+
+   selectMarkerByTagId = (tagId) => {
+    let tag = this.annotationContainer.querySelector(`[data-id="${tagId}"]`);
+    if (tag) {
+      let markerAnnotation=tag.parentNode.parentNode.parentNode
+      this.removeSelectedAnnotation();
+      this.currentMovement = new Movement(markerAnnotation, -1, this.boundRect);
+      this.selectAnnotation(false);
+    }
+  }
+
 
   targetEventType = (e) => {
     this.removeSelectedAnnotation();
@@ -732,9 +748,15 @@ class BdAIMarker {
    * name:'',
    * }
    */
-  setTag = (tagString) => {
-    if (this.resizeAnnotation) {
-      this.resizeAnnotation.setTagForCurrentMovement(tagString);
+  setTag = (tag) => {
+    if (this.resizeAnnotation && tag) {
+      this.resizeAnnotation.setTagForCurrentMovement(tag);
+    }
+  };
+
+  selectMarkerByTagId = (tagId) => {
+    if (tagId) {
+      this.resizeAnnotation.selectMarkerByTagId(tagId);
     }
   };
 
@@ -751,7 +773,7 @@ class BdAIMarker {
   /**
    * 获取某个标签的数据
    */
-  dataForTag=(tagId)=>{
+  dataForTag = (tagId) => {
     return this.resizeAnnotation.dataSourceOfTag(tagId);
   }
 }
