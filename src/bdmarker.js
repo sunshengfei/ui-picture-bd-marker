@@ -211,9 +211,11 @@ class ResizeAnnotation {
   }
 
   //获取数据模板
-  dataTemplate = (tag, tagName, x, y, x1, y1) => {
+  dataTemplate = (tag, x, y, x1, y1) => {
     if (!tag || !/^.+$/gi.test(tag)) {
-      tag = `temp@${new Date().getTime()}`;
+      tag = {
+        tag:`temp@${new Date().getTime()}`,
+      };
     }
     return {
       ...tag,
@@ -376,6 +378,10 @@ class ResizeAnnotation {
     } else {
       tagString = '请选择或添加新标签';
       tagId = `temp@${UUID(16, 16)}`;
+      tag={
+        tag:tagId,
+        tagName:tagString
+      }
     }
     for (let prop in resizeDotClasses) {
       let resizeDot = document.createElement('div');
@@ -419,7 +425,7 @@ class ResizeAnnotation {
       parseFloat(rect.y) + parseFloat(rect.height) + '%')
     this.data.push(dts);
     this.callback.onUpdated(this.dataSource());
-    this.callback.onDrawOne(dts)
+    this.callback.onDrawOne(dts,this.currentMovement)
   };
 
   dragEventOn = (e) => {
