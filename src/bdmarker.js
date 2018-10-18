@@ -260,13 +260,14 @@ class ResizeAnnotation {
   };
 
   dataSourceOfTag = (tagId) => {
+    let values=[];
     for (let i = 0; i < this.data.length; i++) {
       let value = this.data[i];
       if (value.tag === tagId) {
-        return value
+        values.push(value);
       }
     }
-    return void 0;
+    return values;
   };
 
 
@@ -285,10 +286,11 @@ class ResizeAnnotation {
           node.querySelector(`.${imageOpTag}`).dataset[k] = tagOb[k];
         }
       }
+      let uuid=node.dataset.uuid;
       node.querySelector(`.${imageOpTag}`).innerText = tag_str;
       for (let i = 0; i < this.data.length; i++) {
         let value = this.data[i];
-        if (value.tag === oldtag) {
+        if (value.tag === oldtag && value.uuid===uuid) {
           value.tag = tag_id;
           value.tagName = tag_str;
           node.querySelector(`.${imageOpTag}`).dataset.id = tag_id;
@@ -304,17 +306,18 @@ class ResizeAnnotation {
     //获取tag
     if (this.currentMovement == null) return;
     const node = this.currentMovement.moveNode;
+    let uuid=node.dataset.uuid;
     const tag = node.querySelector(`.${imageOpTag}`).dataset.id;
     let position = {
       x: node.style.left,
       y: node.style.top,
-      x1: parseFloat(node.style.width) + parseFloat(node.style.left) + '%',
-      y1: parseFloat(node.style.height) + parseFloat(node.style.top) + '%',
+      x1: (parseFloat(node.style.width) + parseFloat(node.style.left)).toFixed(3) + '%',
+      y1: (parseFloat(node.style.height) + parseFloat(node.style.top)).toFixed(3) + '%',
     };
     //从原有的数据集查找该tag
     for (let i = 0; i < this.data.length; i++) {
       let value = this.data[i];
-      if (value.tag === tag) {
+      if (value.tag === tag && value.uuid===uuid) {
         value.position = position;
       }
       this.data[i] = value;
@@ -327,10 +330,11 @@ class ResizeAnnotation {
     if (!options.editable) return;
     if (this.currentMovement) {
       const node = this.currentMovement.moveNode;
+      let uuid=node.dataset.uuid;
       const tag = node.querySelector(`.${imageOpTag}`).dataset.id;
       for (let i = 0; i < this.data.length; i++) {
         let value = this.data[i];
-        if (value.tag === tag) {
+        if (value.tag === tag && value.uuid===uuid) {
           this.data.splice(i, 1);
           break;
         }
@@ -365,6 +369,8 @@ class ResizeAnnotation {
       bottomRight: `${PREFIX_RESIZE_DOT} bottom-right`,
       trash: 'g-image-op',
     };
+    let uu=`${UUID(16, 16)}`;
+    annotation.dataset.uuid=uu;
     // this.callback
     let i = 0;
     let tagString, tagId;
@@ -377,7 +383,7 @@ class ResizeAnnotation {
       tagId = tag;
     } else {
       tagString = '请选择或添加新标签';
-      tagId = `temp@${UUID(16, 16)}`;
+      tagId = `temp@${uu}`;
       tag={
         tag:tagId,
         tagName:tagString
@@ -423,7 +429,7 @@ class ResizeAnnotation {
     let dts = this.dataTemplate(tag, rect.x, rect.y,
       parseFloat(rect.x) + parseFloat(rect.width) + '%',
       parseFloat(rect.y) + parseFloat(rect.height) + '%')
-    this.data.push(dts);
+    this.data.push({...dts,uuid:uu});
     this.callback.onUpdated(this.dataSource());
     this.callback.onDrawOne(dts,this.currentMovement)
   };
