@@ -89,6 +89,7 @@ class MUTester {
             blurOtherDotsShowTags: false,
             editable: true,
             trashPositionStart:1,
+            boundReachPercent:0.01,
           },
           onDataRendered: () => {
             this.test_getDataset();
@@ -149,7 +150,9 @@ export {
 
 
 ```
-
+### ver1.1.6
+---
+1.增加options配置`boundReachPercent`,控制能达到边界点的百分比分子 取值0.0~100
 
 ### ver1.1.4更新说明
 ---

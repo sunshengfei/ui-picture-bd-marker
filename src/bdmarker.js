@@ -18,7 +18,8 @@ let options = {
   blurOtherDots: true,
   blurOtherDotsShowTags: false,
   editable: true,
-  trashPositionStart: 0
+  trashPositionStart: 0,
+  boundReachPercent:0.01
 };
 
 const PREFIX_RESIZE_DOT = 'resize-dot';
@@ -100,12 +101,12 @@ class Movement {
     const heightOffset = 100 * offsetY / this.boundRect.height;
     const widthOffset = 100 * offsetX / this.boundRect.width;
     // console.log( `this.type=${this.type},rawHeightp=${rawHeightp},rawWidthp=${rawWidthp},rawTop=${rawTop},rawLeft=${rawLeft},heightOffset=${heightOffset},widthOffset=${widthOffset}`);
-    if (rawTop + heightOffset < 1 || rawTop + heightOffset > 99) {
+    if (rawTop + heightOffset < options.boundReachPercent || rawTop + heightOffset > (100-options.boundReachPercent)) {
       return;
     }
     if (this.type === 0) {
       //top
-      if (rawHeightp - heightOffset < 1) {
+      if (rawHeightp - heightOffset < options.boundReachPercent) {
         return;
       }
       parentEl.style.top = (rawTop + heightOffset).toFixed(3) + '%';
@@ -116,7 +117,7 @@ class Movement {
     }
     else if (this.type === 2) {
       //left
-      if (widthOffset + rawLeft < 1 || widthOffset + rawLeft >= rawWidthp + rawLeft) {
+      if (widthOffset + rawLeft < options.boundReachPercent || widthOffset + rawLeft >= rawWidthp + rawLeft) {
         return;
       }
       parentEl.style.left = (widthOffset + rawLeft).toFixed(3) + '%';
@@ -127,10 +128,10 @@ class Movement {
       parentEl.style.width = (rawWidthp + widthOffset).toFixed(3) + '%';
     } else if (this.type === 4) {
       //top-left
-      if (rawHeightp - heightOffset < 1) {
+      if (rawHeightp - heightOffset < options.boundReachPercent) {
         return;
       }
-      if (rawWidthp - widthOffset < 1) {
+      if (rawWidthp - widthOffset < options.boundReachPercent) {
         return;
       }
       parentEl.style.top = (rawTop + heightOffset).toFixed(3) + '%';
@@ -140,10 +141,10 @@ class Movement {
     }
     else if (this.type === 5) {
       //top-right
-      if (rawWidthp + widthOffset < 1) {
+      if (rawWidthp + widthOffset < options.boundReachPercent) {
         return;
       }
-      if (rawHeightp - heightOffset < 1) {
+      if (rawHeightp - heightOffset < options.boundReachPercent) {
         return;
       }
       parentEl.style.top = (rawTop + heightOffset).toFixed(3) + '%';
@@ -152,10 +153,10 @@ class Movement {
     }
     else if (this.type === 6) {
       //bottom-left
-      if (rawHeightp + heightOffset < 1) {
+      if (rawHeightp + heightOffset < options.boundReachPercent) {
         return;
       }
-      if (rawWidthp - widthOffset < 1) {
+      if (rawWidthp - widthOffset < options.boundReachPercent) {
         return;
       }
       parentEl.style.height = (rawHeightp + heightOffset).toFixed(3) + '%';
@@ -164,10 +165,10 @@ class Movement {
     }
     else if (this.type === 7) {
       //bottom-right
-      if (rawHeightp + heightOffset < 1) {
+      if (rawHeightp + heightOffset < options.boundReachPercent) {
         return;
       }
-      if (rawWidthp + widthOffset < 1) {
+      if (rawWidthp + widthOffset < options.boundReachPercent) {
         return;
       }
       parentEl.style.height = (rawHeightp + heightOffset).toFixed(3) + '%';
@@ -175,10 +176,10 @@ class Movement {
 
     } else if (this.type === -1) {
       // //move
-      if (heightOffset + rawTop < 1 || heightOffset + rawTop + rawHeightp > 99) {
+      if (heightOffset + rawTop < options.boundReachPercent || heightOffset + rawTop + rawHeightp > (100-options.boundReachPercent)) {
         return;
       }
-      if (widthOffset + rawLeft < 1 || widthOffset + rawLeft + rawWidthp > 99) {
+      if (widthOffset + rawLeft < options.boundReachPercent || widthOffset + rawLeft + rawWidthp > (100-options.boundReachPercent)) {
         return;
       }
       parentEl.style.top = (heightOffset + rawTop).toFixed(3) + '%';
