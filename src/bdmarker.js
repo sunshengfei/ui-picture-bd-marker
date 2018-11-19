@@ -1,4 +1,4 @@
-import { isArray } from "util";
+import { isArray, debug } from "util";
 import { setTimeout } from "timers";
 
 'use strict';
@@ -14,13 +14,7 @@ const MOUSE_EVENT = [
 let drawCursorEvent = MOUSE_EVENT;
 let eventTargetOnTransform = false;
 const imageOpTag = 'g-image-op-name'
-let options = {
-  blurOtherDots: true,
-  blurOtherDotsShowTags: false,
-  editable: true,
-  trashPositionStart: 0,
-  boundReachPercent:0.01
-};
+
 
 const PREFIX_RESIZE_DOT = 'resize-dot';
 
@@ -63,14 +57,18 @@ const UUID = (len, radix) => {
   return uuid.join('');
 };
 
-const percentToSize = (percent, baseWith = 0) => {
-  return parseFloat(percent)
-    .toFixed(3) * baseWith / 100;
+const percentToSize = (percent, baseDistance = 0) => {
+  return Math.round(parseFloat(percent)
+    .toFixed(3) * baseDistance / 100);
 };
 
-const positionP2S = (position = { x: '0%', y: '0%', x1: '0%', y1: '0%' }, baseWith = 0) => {
+const positionP2S = (position = { x: '0%', y: '0%', x1: '0%', y1: '0%' }, baseWith = 100, baseHeight = 100) => {
   for (let o in position) {
-    position[o] = percentToSize(position[o], baseWith);
+    if (o.startsWith('x')) {
+      position[o] = percentToSize(position[o], baseWith);
+    } else {
+      position[o] = percentToSize(position[o], baseHeight);
+    }
   }
   return position;
 };
@@ -85,14 +83,15 @@ const transformDataArray = (data = [], baseWith = 0) => {
 
 class Movement {
 
-  constructor(node, type = -1, boundRect) {
+  constructor(node, type = -1, boundRect,options) {
     this.moveNode = node;
     this.type = type;
     this.boundRect = boundRect;
+    this.options = options;
   }
 
   transform = (offsetX, offsetY) => {
-    if (!options.editable) return;
+    if (!this.options.editable) return;
     let parentEl = this.moveNode;
     const rawHeightp = parseFloat(parentEl.style.height);
     const rawWidthp = parseFloat(parentEl.style.width);
@@ -101,12 +100,12 @@ class Movement {
     const heightOffset = 100 * offsetY / this.boundRect.height;
     const widthOffset = 100 * offsetX / this.boundRect.width;
     // console.log( `this.type=${this.type},rawHeightp=${rawHeightp},rawWidthp=${rawWidthp},rawTop=${rawTop},rawLeft=${rawLeft},heightOffset=${heightOffset},widthOffset=${widthOffset}`);
-    if (rawTop + heightOffset < options.boundReachPercent || rawTop + heightOffset > (100-options.boundReachPercent)) {
+    if (rawTop + heightOffset < this.options.boundReachPercent || rawTop + heightOffset > (100 - this.options.boundReachPercent)) {
       return;
     }
     if (this.type === 0) {
       //top
-      if (rawHeightp - heightOffset < options.boundReachPercent) {
+      if (rawHeightp - heightOffset < this.options.boundReachPercent) {
         return;
       }
       parentEl.style.top = (rawTop + heightOffset).toFixed(3) + '%';
@@ -117,7 +116,7 @@ class Movement {
     }
     else if (this.type === 2) {
       //left
-      if (widthOffset + rawLeft < options.boundReachPercent || widthOffset + rawLeft >= rawWidthp + rawLeft) {
+      if (widthOffset + rawLeft < this.options.boundReachPercent || widthOffset + rawLeft >= rawWidthp + rawLeft) {
         return;
       }
       parentEl.style.left = (widthOffset + rawLeft).toFixed(3) + '%';
@@ -128,10 +127,10 @@ class Movement {
       parentEl.style.width = (rawWidthp + widthOffset).toFixed(3) + '%';
     } else if (this.type === 4) {
       //top-left
-      if (rawHeightp - heightOffset < options.boundReachPercent) {
+      if (rawHeightp - heightOffset < this.options.boundReachPercent) {
         return;
       }
-      if (rawWidthp - widthOffset < options.boundReachPercent) {
+      if (rawWidthp - widthOffset < this.options.boundReachPercent) {
         return;
       }
       parentEl.style.top = (rawTop + heightOffset).toFixed(3) + '%';
@@ -141,10 +140,10 @@ class Movement {
     }
     else if (this.type === 5) {
       //top-right
-      if (rawWidthp + widthOffset < options.boundReachPercent) {
+      if (rawWidthp + widthOffset < this.options.boundReachPercent) {
         return;
       }
-      if (rawHeightp - heightOffset < options.boundReachPercent) {
+      if (rawHeightp - heightOffset < this.options.boundReachPercent) {
         return;
       }
       parentEl.style.top = (rawTop + heightOffset).toFixed(3) + '%';
@@ -153,10 +152,10 @@ class Movement {
     }
     else if (this.type === 6) {
       //bottom-left
-      if (rawHeightp + heightOffset < options.boundReachPercent) {
+      if (rawHeightp + heightOffset < this.options.boundReachPercent) {
         return;
       }
-      if (rawWidthp - widthOffset < options.boundReachPercent) {
+      if (rawWidthp - widthOffset < this.options.boundReachPercent) {
         return;
       }
       parentEl.style.height = (rawHeightp + heightOffset).toFixed(3) + '%';
@@ -165,10 +164,10 @@ class Movement {
     }
     else if (this.type === 7) {
       //bottom-right
-      if (rawHeightp + heightOffset < options.boundReachPercent) {
+      if (rawHeightp + heightOffset < this.options.boundReachPercent) {
         return;
       }
-      if (rawWidthp + widthOffset < options.boundReachPercent) {
+      if (rawWidthp + widthOffset < this.options.boundReachPercent) {
         return;
       }
       parentEl.style.height = (rawHeightp + heightOffset).toFixed(3) + '%';
@@ -176,10 +175,10 @@ class Movement {
 
     } else if (this.type === -1) {
       // //move
-      if (heightOffset + rawTop < options.boundReachPercent || heightOffset + rawTop + rawHeightp > (100-options.boundReachPercent)) {
+      if (heightOffset + rawTop < this.options.boundReachPercent || heightOffset + rawTop + rawHeightp > (100 - this.options.boundReachPercent)) {
         return;
       }
-      if (widthOffset + rawLeft < options.boundReachPercent || widthOffset + rawLeft + rawWidthp > (100-options.boundReachPercent)) {
+      if (widthOffset + rawLeft < this.options.boundReachPercent || widthOffset + rawLeft + rawWidthp > (100 - this.options.boundReachPercent)) {
         return;
       }
       parentEl.style.top = (heightOffset + rawTop).toFixed(3) + '%';
@@ -189,28 +188,35 @@ class Movement {
 
 }
 
+let defaultConfig = {
+  options: {
+    blurOtherDots: true,
+    blurOtherDotsShowTags: false,
+    editable: true,
+    trashPositionStart: 0,
+    boundReachPercent: 0.02
+  },
+  onDataRendered: function () {},
+  onUpdated: function () { },
+  onDrawOne: function () { },
+  onSelect: function () { },
+};
 
 class ResizeAnnotation {
 
-  static defaultConfig = {
-    options: {},
-    onDataRendered: function () { },
-    onUpdated: function () { },
-    onDrawOne: function () { },
-    onSelect: function () { },
-  };
-
-  constructor(parentNode, boundRect, callback = ResizeAnnotation.defaultConfig) {
-    options = Object.assign(options, callback.options);
+  constructor(parentNode, boundRect, callback = defaultConfig) {
+    this.options = Object.assign(defaultConfig.options, callback.options);
     this.annotationContainer = parentNode;
     this.boundRect = boundRect;
     this.actionDown = false;
     this.currentMovement = null;
-    this.callback = Object.assign(ResizeAnnotation.defaultConfig, callback);
+    this.callback = Object.assign(defaultConfig, callback);
     this.data = [];
-    // this.renderData=this.renderData.bind(this);
   }
 
+  setConfigOptions = (newOptions) => {
+    this.options = Object.assign(this.options, newOptions.options);
+  }
   //获取数据模板
   dataTemplate = (tag, x, y, x1, y1) => {
     if (!tag || !/^.+$/gi.test(tag)) {
@@ -326,7 +332,7 @@ class ResizeAnnotation {
 
 
   removeAnnotationEvent = (e) => {
-    if (!options.editable) return;
+    if (!this.options.editable) return;
     if (this.currentMovement) {
       const node = this.currentMovement.moveNode;
       let uuid = node.dataset.uuid;
@@ -391,7 +397,7 @@ class ResizeAnnotation {
     for (let prop in resizeDotClasses) {
       let resizeDot = document.createElement('div');
       if (i === 8) {
-        resizeDot.className = `${options.blurOtherDotsShowTags
+        resizeDot.className = `${this.options.blurOtherDotsShowTags
           ? ''
           : `${cls[i]}`} ${resizeDotClasses[prop]}`;
         let opContent = document.createElement('div');
@@ -405,7 +411,7 @@ class ResizeAnnotation {
         tag.className = `${imageOpTag}`;
         tag.innerText = tagString;
         tag.dataset.id = tagId;
-        if (options.trashPositionStart) {
+        if (this.options.trashPositionStart) {
           opContent.appendChild(trash);
           opContent.appendChild(tag);
         } else {
@@ -414,7 +420,7 @@ class ResizeAnnotation {
         }
         resizeDot.appendChild(opContent);
       } else {
-        resizeDot.className = `${resizeDotClasses[prop]} ${cls[i]} ${options.editable
+        resizeDot.className = `${resizeDotClasses[prop]} ${cls[i]} ${this.options.editable
           ? ''
           : 'hidden'}`;
       }
@@ -423,7 +429,7 @@ class ResizeAnnotation {
     }
     //加事件
     this.annotationContainer.appendChild(annotation);
-    this.currentMovement = new Movement(annotation, 0, this.boundRect);
+    this.currentMovement = new Movement(annotation, 0, this.boundRect,this.options);
     // this.selectAnnotation();
     let dts = this.dataTemplate(tag, rect.x, rect.y,
       parseFloat(rect.x) + parseFloat(rect.width) + '%',
@@ -436,6 +442,10 @@ class ResizeAnnotation {
   dragEventOn = (e) => {
     // e.preventDefault();
     // e.stopPropagation();
+    // if (!e.target.classList.contains('annotation') &&
+    //     !e.target.classList.contains(`${PREFIX_RESIZE_DOT}`)) {
+    //     eventTargetOnTransform = false;
+    //   }
     const eventType = e.type;
     let clientX = e.clientX,
       clientY = e.clientY;
@@ -459,12 +469,12 @@ class ResizeAnnotation {
         this.lastY = this.moveY;
       }
     } else {
+      eventTargetOnTransform = false;
       if (this.actionDown) {
         this.updateMovementData();
         this.selectAnnotation();
       }
       this.actionDown = false;
-      eventTargetOnTransform = false;
     }
     // console.log(eventType);
   };
@@ -473,7 +483,7 @@ class ResizeAnnotation {
     if (this.currentMovement) {
       let cs = this.currentMovement.moveNode.classList;
       cs.remove('selected');
-      if (options.blurOtherDots) {
+      if (this.options.blurOtherDots) {
         this.currentMovement.moveNode.querySelectorAll(`[class*=${PREFIX_RESIZE_DOT}]`)
           .forEach((node) => {
             node.classList.add('hidden');
@@ -486,8 +496,8 @@ class ResizeAnnotation {
     if (this.currentMovement) {
       let cs = this.currentMovement.moveNode.classList;
       cs.add('selected');
-      if (options.blurOtherDots) {
-        if (!options.editable) {
+      if (this.options.blurOtherDots) {
+        if (!this.options.editable) {
           this.currentMovement.moveNode.querySelectorAll(`[class*=${PREFIX_RESIZE_DOT}]`)
             .forEach((node) => {
               if (node.classList.contains(cls[8])) {
@@ -509,7 +519,7 @@ class ResizeAnnotation {
       const tagAttr = node.querySelector(`.${imageOpTag}`).dataset;
       this.callback.onSelect({
         ...tagAttr,
-        ...this.dataSourceOfTag(tagAttr.id,node.dataset.uuid)
+        ...this.dataSourceOfTag(tagAttr.id, node.dataset.uuid),
       })
     }
   };
@@ -519,11 +529,10 @@ class ResizeAnnotation {
     if (tag) {
       let markerAnnotation = tag.parentNode.parentNode.parentNode
       this.removeSelectedAnnotation();
-      this.currentMovement = new Movement(markerAnnotation, -1, this.boundRect);
+      this.currentMovement = new Movement(markerAnnotation, -1, this.boundRect,this.options);
       this.selectAnnotation(false);
     }
   }
-
 
   targetEventType = (e) => {
     this.removeSelectedAnnotation();
@@ -531,35 +540,35 @@ class ResizeAnnotation {
     let parentEl = el.classList.contains('annotation') ? el : el.parentNode;
     if (el.classList.contains(cls[0])) {
       //top
-      this.currentMovement = new Movement(parentEl, 0, this.boundRect);
+      this.currentMovement = new Movement(parentEl, 0, this.boundRect,this.options);
     } else if (el.classList.contains(cls[1])) {
       //bottom
-      this.currentMovement = new Movement(parentEl, 1, this.boundRect);
+      this.currentMovement = new Movement(parentEl, 1, this.boundRect,this.options);
     }
     else if (el.classList.contains(cls[2])) {
       //left
-      this.currentMovement = new Movement(parentEl, 2, this.boundRect);
+      this.currentMovement = new Movement(parentEl, 2, this.boundRect,this.options);
     }
     else if (el.classList.contains(cls[3])) {
       //right
-      this.currentMovement = new Movement(parentEl, 3, this.boundRect);
+      this.currentMovement = new Movement(parentEl, 3, this.boundRect,this.options);
     } else if (el.classList.contains(cls[4])) {
       //top-left
-      this.currentMovement = new Movement(parentEl, 4, this.boundRect);
+      this.currentMovement = new Movement(parentEl, 4, this.boundRect,this.options);
     }
     else if (el.classList.contains(cls[5])) {
       //top-right
-      this.currentMovement = new Movement(parentEl, 5, this.boundRect);
+      this.currentMovement = new Movement(parentEl, 5, this.boundRect,this.options);
     }
     else if (el.classList.contains(cls[6])) {
       //bottom-left
-      this.currentMovement = new Movement(parentEl, 6, this.boundRect);
+      this.currentMovement = new Movement(parentEl, 6, this.boundRect,this.options);
     }
     else if (el.classList.contains(cls[7])) {
       //bottom-right
-      this.currentMovement = new Movement(parentEl, 7, this.boundRect);
+      this.currentMovement = new Movement(parentEl, 7, this.boundRect,this.options);
     } else if (el.classList.contains('annotation')) {
-      this.currentMovement = new Movement(parentEl, -1, this.boundRect);
+      this.currentMovement = new Movement(parentEl, -1, this.boundRect,this.options);
     } else {
       this.currentMovement = null;
     }
@@ -580,10 +589,11 @@ class ResizeAnnotation {
 
 class BdAIMarker {
 
-  constructor(layer, draft, resizeAnnotation, options = {}) {
-    if (typeof options !== 'object') {
+  constructor(layer, draft, resizeAnnotation, configs = {}) {
+    if (typeof configs !== 'object') {
       throw 'Please provide a callback Config for BdAIMarker';
     }
+    this.options = Object.assign(defaultConfig.options,configs.options);
     if (layer) {
       this.layer = layer;
       this.draft = draft;
@@ -595,7 +605,7 @@ class BdAIMarker {
         return layer.getBoundingClientRect();
       };
       this.resizeAnnotation = resizeAnnotation ? resizeAnnotation : new ResizeAnnotation(
-        draft.parentNode, this.boundRect(), options);
+        draft.parentNode, this.boundRect(), configs);
       drawCursorEvent.forEach((currentValue, index, arr) => {
         layer.addEventListener(currentValue, (e) => {
           let x = e.clientX,
@@ -603,6 +613,13 @@ class BdAIMarker {
           this.mouseEventHandler(e, x, y);
         }, true);
       });
+    }
+  }
+
+  setConfigOptions = (newOptions) => {
+    this.options = Object.assign(this.options, newOptions.options)
+    if (this.resizeAnnotation) {
+      this.resizeAnnotation.setConfigOptions(this.options);
     }
   }
 
@@ -661,7 +678,7 @@ class BdAIMarker {
 
   //  更新定位点
   anchorAt = (x, y) => {
-    if (!options.editable) return;
+    if (!this.options.editable) return;
     this.draft.style.display = '';
     if (this.moveX < x) {
       this.draft.style.right = 100 * Math.abs(this.boundRect().width - x) / this.boundRect().width +
@@ -725,7 +742,7 @@ class BdAIMarker {
   };
 
   dragTo = (x, y) => {
-    if (!options.editable) return;
+    if (!this.options.editable) return;
     if (this.filterOutOfBounds(x, y)) {
       this.actionDown = false;
     }
