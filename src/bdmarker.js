@@ -238,7 +238,7 @@ class ResizeAnnotation {
 
   setConfigOptions = (newOptions) => {
     this.options = { ...this.options, ...newOptions.options };
-    this.callback = { ...defaultConfig, ...newOptions };
+    this.callback = { ...this.callback, ...newOptions };
   }
   //获取数据模板
   dataTemplate = (tag, x, y, x1, y1) => {
@@ -307,9 +307,13 @@ class ResizeAnnotation {
         tag_id = tag_str = tagOb;
       }
       const oldtag = node.querySelector(`.${imageOpTag}`).dataset.id;
+      let constData={};
       if (typeof tagOb === 'object') {
         tag_str = tagOb['tagName']
         tag_id = tagOb['tag']
+        constData={
+          ...tagOb
+        }
         for (let k in tagOb) {
           node.querySelector(`.${imageOpTag}`).dataset[k] = tagOb[k];
         }
@@ -319,6 +323,12 @@ class ResizeAnnotation {
       for (let i = 0; i < this.data.length; i++) {
         let value = this.data[i];
         if (value.tag === oldtag && value.uuid === uuid) {
+          value={
+            ...value,
+            ...constData,
+            tag:tag_id,
+            tagName:tag_str,
+          }
           value.tag = tag_id;
           value.tagName = tag_str;
           node.querySelector(`.${imageOpTag}`).dataset.id = tag_id;
