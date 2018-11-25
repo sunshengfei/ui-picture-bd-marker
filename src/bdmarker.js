@@ -33,11 +33,17 @@ const MOUSE_EVENT = [
 let drawCursorEvent = MOUSE_EVENT;
 let eventTargetOnTransform = false;
 
+const defaultPositions = {
+  bottom: 0x01,
+  out_bottom: 0x02,
+}
 let defaultConfig = {
   options: {
     blurOtherDots: false,
     blurOtherDotsShowTags: false,
     editable: true,
+    tagLocationAlwaysTop: false,
+    tagLocation: defaultPositions.bottom,
     trashPositionStart: 0,
     boundReachPercent: 0.01
   },
@@ -307,11 +313,11 @@ class ResizeAnnotation {
         tag_id = tag_str = tagOb;
       }
       const oldtag = node.querySelector(`.${imageOpTag}`).dataset.id;
-      let constData={};
+      let constData = {};
       if (typeof tagOb === 'object') {
         tag_str = tagOb['tagName']
         tag_id = tagOb['tag']
-        constData={
+        constData = {
           ...tagOb
         }
         for (let k in tagOb) {
@@ -323,11 +329,11 @@ class ResizeAnnotation {
       for (let i = 0; i < this.data.length; i++) {
         let value = this.data[i];
         if (value.tag === oldtag && value.uuid === uuid) {
-          value={
+          value = {
             ...value,
             ...constData,
-            tag:tag_id,
-            tagName:tag_str,
+            tag: tag_id,
+            tagName: tag_str,
           }
           value.tag = tag_id;
           value.tagName = tag_str;
@@ -435,6 +441,20 @@ class ResizeAnnotation {
           : `${cls[i]}`} ${resizeDotClasses[prop]}`;
         let opContent = document.createElement('div');
         opContent.className = 'g-image-op-content';
+        if (this.options.tagLocationAlwaysTop) {
+          opContent.style.position = 'fixed';
+          opContent.style.top = null;
+          opContent.style.bottom = null;
+          opContent.style.left = null;
+          opContent.style.right = null;
+        } else {
+          if (this.options.tagLocation == defaultPositions.out_bottom) {
+            opContent.style.position = 'absolute';
+            opContent.style.bottom = null;
+          } else {
+            opContent.style.position = null;
+          }
+        }
         let trash = document.createElement('i');
         trash.className = 'g-image-op-del iconfont s-icon icon-trash s-icon-trash';
         trash.innerText = ' × ';
@@ -650,7 +670,7 @@ class BdAIMarker {
   }
 
   setConfigOptions = (newOptions) => {
-    this.options = {...this.options, ...newOptions.options}
+    this.options = { ...this.options, ...newOptions.options }
     if (this.resizeAnnotation) {
       this.resizeAnnotation.setConfigOptions(newOptions);
     }

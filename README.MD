@@ -90,6 +90,8 @@ class MUTester {
             editable: true,
             trashPositionStart:1,
             boundReachPercent:0.01,
+            tagLocationAlwaysTop: false,
+            tagLocation: 2,
           },
           onDataRendered: () => {
             this.test_getDataset();
@@ -150,6 +152,14 @@ export {
 
 
 ```
+### ver1.3.2
+---
+1.增加控制标签位置options参数
+```  
+  tagLocationAlwaysTop: false,//标签是否不被外边界遮挡
+  tagLocation: 2 // 1内底部 2外底部 
+```
+
 ### ver1.1.9
 ---
 1.修复页面存在一个以上的控件出现的无法标注问题
