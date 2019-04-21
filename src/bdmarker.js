@@ -42,7 +42,6 @@ let defaultConfig = {
     blurOtherDots: false,
     blurOtherDotsShowTags: false,
     editable: true,
-    tagLocationAlwaysTop: false,
     tagLocation: defaultPositions.bottom,
     trashPositionStart: 0,
     boundReachPercent: 0.01
@@ -277,12 +276,28 @@ class ResizeAnnotation {
     if (dataArray instanceof Array && dataArray.length > 0) {
       dataArray.forEach((data, index, arr) => {
         //currentValue => rect
-        let rect = {
-          x: (100 * data.position.x / base.width).toFixed(3) + '%',
-          y: (100 * data.position.y / base.height).toFixed(3) + '%',
-          width: (100 * (data.position.x1 - data.position.x) / base.width).toFixed(3) + '%',
-          height: (100 * (data.position.y1 - data.position.y) / base.height).toFixed(3) + '%',
-        };
+        // let rect = {
+        //   x: (100 * data.position.x / base.width).toFixed(3) + '%',
+        //   y: (100 * data.position.y / base.height).toFixed(3) + '%',
+        //   width: (100 * (data.position.x1 - data.position.x) / base.width).toFixed(3) + '%',
+        //   height: (100 * (data.position.y1 - data.position.y) / base.height).toFixed(3) + '%',
+        // };
+        let rect;
+        if (data.position.x.endsWith('%')) {
+          rect = {
+            x: data.position.x,
+            y: data.position.y,
+            width: (parseFloat(data.position.x1) - parseFloat(data.position.x)) + '%',
+            height: (parseFloat(data.position.y1) - parseFloat(data.position.y)) + '%'
+          }
+        } else {
+          rect = {
+            x: (100 * data.position.x / base.width).toFixed(3) + '%',
+            y: (100 * data.position.y / base.height).toFixed(3) + '%',
+            width: (100 * (data.position.x1 - data.position.x) / base.width).toFixed(3) + '%',
+            height: (100 * (data.position.y1 - data.position.y) / base.height).toFixed(3) + '%'
+          };
+        }
         this.drawAnnotation(rect, data);
       });
     } else {
@@ -441,19 +456,11 @@ class ResizeAnnotation {
           : `${cls[i]}`} ${resizeDotClasses[prop]}`;
         let opContent = document.createElement('div');
         opContent.className = 'g-image-op-content';
-        if (this.options.tagLocationAlwaysTop) {
-          opContent.style.position = 'fixed';
-          opContent.style.top = null;
+        if (this.options.tagLocation == defaultPositions.out_bottom) {
+          opContent.style.position = 'absolute';
           opContent.style.bottom = null;
-          opContent.style.left = null;
-          opContent.style.right = null;
         } else {
-          if (this.options.tagLocation == defaultPositions.out_bottom) {
-            opContent.style.position = 'absolute';
-            opContent.style.bottom = null;
-          } else {
-            opContent.style.position = null;
-          }
+          opContent.style.position = null;
         }
         let trash = document.createElement('i');
         trash.className = 'g-image-op-del iconfont s-icon icon-trash s-icon-trash';

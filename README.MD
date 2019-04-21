@@ -152,11 +152,15 @@ export {
 
 
 ```
-### ver1.3.2
+
+### ver1.3.4
+---
+1.增加支持渲染值为百分比
+
+### ver1.3.3
 ---
 1.增加控制标签位置options参数
-```  
-  tagLocationAlwaysTop: false,//标签是否不被外边界遮挡
+```
   tagLocation: 2 // 1内底部 2外底部 
 ```
 
