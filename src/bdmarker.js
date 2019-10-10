@@ -384,11 +384,10 @@ class ResizeAnnotation {
     this.callback.onUpdated(this.dataSource(), this.currentMovement);
   };
 
-
   removeAnnotationEvent = (e) => {
     if (!this.options.editable) return;
-    if (this.currentMovement) {
-      const node = this.currentMovement.moveNode;
+    const node=e.target.parentNode.parentNode.parentNode;
+    if (node) {
       let uuid = node.dataset.uuid;
       const tag = node.querySelector(`.${imageOpTag}`).dataset.id;
       for (let i = 0; i < this.data.length; i++) {

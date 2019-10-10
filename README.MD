@@ -13,9 +13,16 @@ npm install ui-picture-bd-marker -D
 
 源码仓库：[https://github.com/FRED5DON/ui-picture-bd-marker](https://github.com/FRED5DON/ui-picture-bd-marker)
 
-文档地址 ：[https://vmarker.sagocloud.com/about/](https://vmarker.sagocloud.com/about/)
+文档地址 ：[https://vmarker.sagocloud.com/diy/](https://vmarker.sagocloud.com/diy/#upbm)
 
-### ver1.3.5
+### ver1.3.7
+---
+1.修复一处删除操作后数据未刷新的bug
+
+
+感谢（@mrlinjun）
+
+### ver1.3.6
 ---
 1.增加支持渲染值为百分比
 
