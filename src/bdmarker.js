@@ -386,21 +386,22 @@ class ResizeAnnotation {
 
   removeAnnotationEvent = (e) => {
     if (!this.options.editable) return;
-    const node=e.target.parentNode.parentNode.parentNode;
-    if (node) {
+    let selectNode=e.currentTarget.parentNode.parentNode.parentNode;
+    if (selectNode) {
+      const node = selectNode;
       let uuid = node.dataset.uuid;
-      const tag = node.querySelector(`.${imageOpTag}`).dataset.id;
+      // const tag = node.querySelector(`.${imageOpTag}`).dataset.id;
       for (let i = 0; i < this.data.length; i++) {
         let value = this.data[i];
-        if (value.tag === tag && value.uuid === uuid) {
+        if (//value.tag === tag && 
+          value.uuid === uuid) {
           this.data.splice(i, 1);
           break;
         }
       }
       this.callback.onUpdated(this.dataSource());
     }
-    e.target.parentNode.parentNode.parentNode.remove();
-    // e.parentNode.parentNode.removeFromParent();
+    e.currentTarget.parentNode.parentNode.parentNode.remove();
   };
 
   //init

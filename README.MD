@@ -15,7 +15,7 @@ npm install ui-picture-bd-marker -D
 
 文档地址 ：[https://vmarker.sagocloud.com/diy/](https://vmarker.sagocloud.com/diy/#upbm)
 
-### ver1.3.7
+### ver1.3.8
 ---
 1.修复一处删除操作后数据未刷新的bug
 
