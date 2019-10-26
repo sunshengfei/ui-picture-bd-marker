@@ -1,6 +1,6 @@
 {
   "name": "ui-picture-bd-marker",
-  "version": "1.3.9",
+  "version": "1.4.1",
   "description": "高仿百度AI图像物体检测标注控件",
   "main": "index.js",
   "scripts": {
@@ -9,6 +9,7 @@
   },
   "keywords": [
     "marker",
+    "AI工具",
     "图像画框",
     "标签",
     "标注"
