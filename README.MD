@@ -15,10 +15,10 @@ npm install ui-picture-bd-marker -D
 
 文档地址 ：[https://vmarker.sagocloud.com/diy/](https://vmarker.sagocloud.com/diy/#upbm)
 
-### ver1.4.2
+### ver2.0.0
 ---
-1. 修复图像宽高在某些情况下，在导致内部变量不更新的问题。
-2. 重组结构，增加默认配置。
+1. 重组结构，增加默认配置。
+2. 修复图像宽高在某些情况下，在导致内部变量不更新的问题。
 3. 支持图片高度超出屏幕后进行标注。
 4. 重新编写VMarker项目中使用的API。
 
