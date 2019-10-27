@@ -24,15 +24,11 @@
 
 import {
   MOUSE_EVENT,
-  dotCls,
-  imageOpTag,
   PREFIX_RESIZE_DOT,
   defaultPositions, defaultConfig,
   UUID, percentToSize, positionP2S, transformDataArray
 } from './config';
 import ResizeAnnotation from './anno';
-
-let drawCursorEvent = MOUSE_EVENT;
 
 class BdAIMarker {
   eventTargetOnTransform = false;
@@ -55,7 +51,7 @@ class BdAIMarker {
       this.resizeAnnotation = resizeAnnotation ? resizeAnnotation : new ResizeAnnotation(
         draft.parentNode, this.boundRect, configs, this.$callback_handler);
       let self = this;
-      drawCursorEvent.forEach((currentValue, index, arr) => {
+      MOUSE_EVENT.forEach((currentValue, index, arr) => {
         layer.addEventListener(currentValue, (e) => {
           let x = e.clientX,
             y = e.clientY;
@@ -76,10 +72,11 @@ class BdAIMarker {
     }
   }
 
-  mouseEventHandler = (e, clientX, clientY, boundRect = this.boundRect()) => {
+  mouseEventHandler = (e, clientX, clientY) => {
     // e.preventDefault();
     // e.stopPropagation();
     let eventType = e.type;
+    let boundRect = this.boundRect();
     this.moveX = clientX - boundRect.x;
     this.moveY = clientY - boundRect.y;
     if (this.eventTargetOnTransform) {
@@ -87,7 +84,7 @@ class BdAIMarker {
       return;
     }
     if (eventType === MOUSE_EVENT[0]) {
-      if (e.target.classList.contains('annotation') ||
+      if (e.target.classList.contains(this.options.annotationClass) ||
         e.target.classList.contains(`${PREFIX_RESIZE_DOT}`)) {
         this.eventTargetOnTransform = true;
         this.resizeAnnotation.dragEventOn(e);
@@ -167,9 +164,11 @@ class BdAIMarker {
 
   filterOutOfBounds = (x, y) => {
     return (
-      x >= this.boundRect().x + this.boundRect().width + 2 ||
-      y >= this.boundRect().y + this.boundRect().height + 2 ||
-      x < 5 || y < 5
+      x >= this.boundRect().width ||
+      // x >= this.boundRect().x + this.boundRect().width + 2 ||
+      y >= this.boundRect().height ||
+      // y >= this.boundRect().y + this.boundRect().height + 2 ||
+      x <1 || y <1
     );
   };
 
@@ -184,7 +183,7 @@ class BdAIMarker {
    * 清空数据
    */
   clearAll = () => {
-    let annotations = this.layer.querySelectorAll('div.annotation');
+    let annotations = this.layer.querySelectorAll(this.options.annotationClass);
     annotations.forEach((item) => {
       item.remove()
     })

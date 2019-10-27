@@ -43,7 +43,8 @@ export const defaultConfig = {
         editable: true,
         tagLocation: defaultPositions.bottom,
         trashPositionStart: 0,
-        boundReachPercent: 0.01
+        boundReachPercent: 0.01,
+        annotationClass: 'annotation',
     },
     onDataRendered: function () { },
     onUpdated: function () { },

@@ -34,12 +34,12 @@ import Movement from './movement';
 
 export default class ResizeAnnotation {
 
-    constructor(parentNode, boundRect, callback = defaultConfig,callback_handler) {
+    constructor(parentNode, boundRect, callback = defaultConfig, callback_handler) {
         this.options = {
             ...defaultConfig.options,
             ...callback.options
         };
-        this.callback_handler=callback_handler;
+        this.callback_handler = callback_handler;
         this.annotationContainer = parentNode;
         this.boundRect = boundRect;
         this.actionDown = false;
@@ -52,6 +52,7 @@ export default class ResizeAnnotation {
         this.options = { ...this.options, ...newOptions.options };
         this.rawConfig = { ...this.rawConfig, ...newOptions };
     }
+    
     //获取数据模板
     dataTemplate = (tag, x, y, x1, y1) => {
         if (!tag || !/^.+$/gi.test(tag)) {
@@ -206,11 +207,13 @@ export default class ResizeAnnotation {
 
     //init
     drawAnnotation = (rect, tag = void 0) => {
-        if (!this.isValid(rect)) return;
+        if (!this.isValid(rect)) {
+            return;
+        }
         this.removeSelectedAnnotation();
         //创建Annotation节点
         let annotation = document.createElement('div');
-        annotation.className = 'annotation selected';
+        annotation.className = `${this.options.annotationClass} selected`;
         annotation.style.position = 'absolute';
         annotation.style.top = rect.y;
         annotation.style.left = rect.x;
@@ -315,7 +318,7 @@ export default class ResizeAnnotation {
             this.actionDown = true;
             this.lastX = this.moveX;
             this.lastY = this.moveY;
-            if(typeof this.callback_handler==='function'){
+            if (typeof this.callback_handler === 'function') {
                 this.callback_handler(true);
             }
             // eventTargetOnTransform = true;
@@ -334,7 +337,7 @@ export default class ResizeAnnotation {
                 this.lastY = this.moveY;
             }
         } else {
-            if(typeof this.callback_handler==='function'){
+            if (typeof this.callback_handler === 'function') {
                 this.callback_handler(false);
             }
             // eventTargetOnTransform = false;
