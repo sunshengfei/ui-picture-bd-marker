@@ -29,6 +29,7 @@ export const MOUSE_EVENT = [
     'mouseout',
     'mouseup',
     'mouseleave',
+    'contextmenu'
 ];
 
 export const defaultPositions = {
@@ -38,18 +39,33 @@ export const defaultPositions = {
 
 export const defaultConfig = {
     options: {
-        blurOtherDots: false,
+        blurOtherDots: true,
         blurOtherDotsShowTags: false,
         editable: true,
+        showTags: true,
+        supportDelKey: true,
         tagLocation: defaultPositions.bottom,
         trashPositionStart: 0,
         boundReachPercent: 0.01,
         annotationClass: 'annotation',
     },
+    onAnnoContextMenu: function (annoData, element, annoContext) { console.log('onAnnoContextMenu') },
+    onAnnoRemoved: function (annoData, element) {
+        console.log('onAnnoRemoved')
+        return true
+    },
+    onAnnoAdded: function (insertItem, element) {
+        console.log('onAnnoAdded')
+    },
+    onAnnoChanged: function (newValue, oldValue) { console.log('onAnnoChanged') },
+    onAnnoDataFullLoaded: function () { console.log('onAnnoDataFullLoaded') },
+    onAnnoSelected: function (value, element) { console.log('onAnnoSelected') },
+    onUpdated: function () { console.log('onUpdated') },
+    // region maybe desperated at the end of 2019  
     onDataRendered: function () { },
-    onUpdated: function () { },
     onDrawOne: function () { },
     onSelect: function () { },
+    // endregion
 };
 
 export const imageOpTag = 'g-image-op-name'

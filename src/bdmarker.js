@@ -25,8 +25,8 @@
 import {
   MOUSE_EVENT,
   PREFIX_RESIZE_DOT,
-  defaultPositions, defaultConfig,
-  UUID, percentToSize, positionP2S, transformDataArray
+  defaultConfig,
+  UUID, positionP2S, transformDataArray
 } from './config';
 import ResizeAnnotation from './anno';
 
@@ -79,6 +79,12 @@ class BdAIMarker {
     let boundRect = this.boundRect();
     this.moveX = clientX - boundRect.x;
     this.moveY = clientY - boundRect.y;
+    if (eventType === MOUSE_EVENT[6]) {
+      this.eventTargetOnTransform = false;
+      this.actionDown = false;
+      this.resizeAnnotation.dragEventOn(e);
+      return;
+    }
     if (this.eventTargetOnTransform) {
       this.resizeAnnotation.dragEventOn(e);
       return;
@@ -168,7 +174,7 @@ class BdAIMarker {
       // x >= this.boundRect().x + this.boundRect().width + 2 ||
       y >= this.boundRect().height ||
       // y >= this.boundRect().y + this.boundRect().height + 2 ||
-      x <1 || y <1
+      x < 1 || y < 1
     );
   };
 
@@ -183,7 +189,7 @@ class BdAIMarker {
    * 清空数据
    */
   clearAll = () => {
-    let annotations = this.layer.querySelectorAll(this.options.annotationClass);
+    let annotations = this.layer.querySelectorAll(`.${this.options.annotationClass}`);
     annotations.forEach((item) => {
       item.remove()
     })

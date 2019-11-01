@@ -46,13 +46,24 @@ export default class ResizeAnnotation {
         this.currentMovement = null;
         this.rawConfig = { ...defaultConfig, ...callback };
         this.data = [];
+        this.setConfigOptions(this.rawConfig)
     }
 
     setConfigOptions = (newOptions) => {
         this.options = { ...this.options, ...newOptions.options };
         this.rawConfig = { ...this.rawConfig, ...newOptions };
+        if (this.options.supportDelKey) {
+            document.onkeydown = (e) => {
+                if (e.keyCode === 8 || e.keyCode === 46) {
+                    let { moveNode } = this.currentMovement || {};
+                    if (moveNode) {
+                        this.removeAnnotation(moveNode);
+                    }
+                }
+            };
+        }
     }
-    
+
     //获取数据模板
     dataTemplate = (tag, x, y, x1, y1) => {
         if (!tag || !/^.+$/gi.test(tag)) {
@@ -105,6 +116,7 @@ export default class ResizeAnnotation {
             this.reset();
         }
         this.rawConfig.onDataRendered();
+        this.rawConfig.onAnnoDataFullLoaded();
     };
 
     dataSource = () => {
@@ -144,6 +156,7 @@ export default class ResizeAnnotation {
             node.querySelector(`.${imageOpTag}`).innerText = tag_str;
             for (let i = 0; i < this.data.length; i++) {
                 let value = this.data[i];
+                let oldValue = Object.assign({}, value);
                 if (value.tag === oldtag && value.uuid === uuid) {
                     value = {
                         ...value,
@@ -151,10 +164,9 @@ export default class ResizeAnnotation {
                         tag: tag_id,
                         tagName: tag_str,
                     }
-                    value.tag = tag_id;
-                    value.tagName = tag_str;
                     node.querySelector(`.${imageOpTag}`).dataset.id = tag_id;
                     node.querySelector(`.${imageOpTag}`).dataset.name = tag_str;
+                    this.rawConfig.onAnnoChanged(value, oldValue);
                 }
                 this.data[i] = value;
             }
@@ -177,33 +189,41 @@ export default class ResizeAnnotation {
         //从原有的数据集查找该tag
         for (let i = 0; i < this.data.length; i++) {
             let value = this.data[i];
+            let oldValue = Object.assign({}, value);
             if (value.tag === tag && value.uuid === uuid) {
                 value.position = position;
+                this.data[i] = value;
+                this.rawConfig.onAnnoChanged(value, oldValue);
             }
-            this.data[i] = value;
         }
         this.rawConfig.onUpdated(this.dataSource(), this.currentMovement);
     };
 
-    removeAnnotationEvent = (e) => {
+    _removeAnnotationEvent = (e) => {
         if (!this.options.editable) return;
         let selectNode = e.currentTarget.parentNode.parentNode.parentNode;
-        if (selectNode) {
-            const node = selectNode;
+        this.removeAnnotation(selectNode);
+    };
+
+    removeAnnotation = (node) => {
+        if (node) {
             let uuid = node.dataset.uuid;
             // const tag = node.querySelector(`.${imageOpTag}`).dataset.id;
+            let value;
             for (let i = 0; i < this.data.length; i++) {
-                let value = this.data[i];
+                value = this.data[i];
                 if (//value.tag === tag && 
                     value.uuid === uuid) {
-                    this.data.splice(i, 1);
+                    if (this.rawConfig.onAnnoRemoved(value)) {
+                        this.data.splice(i, 1);
+                    }
                     break;
                 }
             }
             this.rawConfig.onUpdated(this.dataSource());
+            node.remove();
         }
-        e.currentTarget.parentNode.parentNode.parentNode.remove();
-    };
+    }
 
     //init
     drawAnnotation = (rect, tag = void 0) => {
@@ -259,6 +279,11 @@ export default class ResizeAnnotation {
                     : `${dotCls[i]}`} ${resizeDotClasses[prop]}`;
                 let opContent = document.createElement('div');
                 opContent.className = 'g-image-op-content';
+                if (!this.options.showTags) {
+                    opContent.style.visibility = 'collapse';
+                } else {
+                    opContent.style.visibility = 'visible';
+                }
                 if (this.options.tagLocation == defaultPositions.out_bottom) {
                     opContent.style.position = 'absolute';
                     opContent.style.bottom = null;
@@ -268,7 +293,7 @@ export default class ResizeAnnotation {
                 let trash = document.createElement('i');
                 trash.className = 'g-image-op-del iconfont s-icon icon-trash s-icon-trash';
                 trash.innerText = ' × ';
-                trash.addEventListener('click', this.removeAnnotationEvent, true);
+                trash.addEventListener('click', this._removeAnnotationEvent, true);
                 let tag = document.createElement('span');
                 tag.dataset.name = tagString;
                 tag.className = `${imageOpTag}`;
@@ -292,13 +317,26 @@ export default class ResizeAnnotation {
         }
         //加事件
         this.annotationContainer.appendChild(annotation);
+        annotation.oncontextmenu = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            let node = e.target;
+            const tagAttr = e.target.querySelector(`.${imageOpTag}`).dataset;
+            let ab = this.dataSourceOfTag(tagAttr.id, node.dataset.uuid);
+            this.rawConfig.onAnnoContextMenu(ab, node, this);
+            // this.removeAnnotation(selectNode);
+            return true;
+        }
         this.currentMovement = new Movement(annotation, 0, this.boundRect(), this.options);
         // this.selectAnnotation();
         let dts = this.dataTemplate(tag, rect.x, rect.y,
             parseFloat(rect.x) + parseFloat(rect.width) + '%',
             parseFloat(rect.y) + parseFloat(rect.height) + '%')
-        this.data.push({ ...dts, uuid: uu });
+        let insertItem = { ...dts, uuid: uu };
+        this.data.push(insertItem);
         this.rawConfig.onUpdated(this.dataSource());
+        this.rawConfig.onAnnoAdded(insertItem, annotation);
         this.rawConfig.onDrawOne(dts, this.currentMovement)
     };
 
@@ -310,6 +348,10 @@ export default class ResizeAnnotation {
         //     eventTargetOnTransform = false;
         //   }
         const eventType = e.type;
+        if (eventType === MOUSE_EVENT[6]) {
+            this.selectAnnotation();
+            return;
+        }
         let clientX = e.clientX,
             clientY = e.clientY;
         this.moveX = clientX;//- this.boundRect().x;
@@ -387,10 +429,12 @@ export default class ResizeAnnotation {
             const node = this.currentMovement.moveNode;
             const tag_str = node.querySelector(`.${imageOpTag}`).innerText;
             const tagAttr = node.querySelector(`.${imageOpTag}`).dataset;
-            this.rawConfig.onSelect({
+            let selectData = {
                 ...tagAttr,
                 ...this.dataSourceOfTag(tagAttr.id, node.dataset.uuid),
-            })
+            }
+            this.rawConfig.onAnnoSelected(selectData, node)
+            this.rawConfig.onSelect(selectData)
         }
     };
 

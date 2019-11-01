@@ -14,13 +14,50 @@ npm install ui-picture-bd-marker -D
 源码仓库：[https://github.com/FRED5DON/ui-picture-bd-marker](https://github.com/FRED5DON/ui-picture-bd-marker)
 
 文档地址 ：[https://vmarker.sagocloud.com/diy/](https://vmarker.sagocloud.com/diy/#upbm)
+### ver2.0.2 - beta版 (注意兼容性问题)
+---
 
-### ver2.0.0
+大范围更新
+1. 补全事件回调,`defaultConfig`参数调整，详见文档。
+    ```
+    export const defaultConfig = {
+    options: {
+        blurOtherDots: true,
+        blurOtherDotsShowTags: false,
+        editable: true,
+        showTags: true,//是否显示标签
+        supportDelKey: true,//支持删除键
+        tagLocation: 1,
+        trashPositionStart: 0,
+        boundReachPercent: 0.01,
+        annotationClass: 'annotation',
+    },
+    onAnnoContextMenu: function (annoData, element, annoContext) { },//自定义右键菜单入口
+    onAnnoRemoved: function (annoData, element) {
+        return true
+    },
+    onAnnoAdded: function (insertItem, element) { //同onDrawOne
+    },
+    onAnnoChanged: function (newValue, oldValue) { },
+    onAnnoDataFullLoaded: function () { },// 同onDataRendered
+    onAnnoSelected: function (value, element) { },//同onSelect
+    onUpdated: function () { },
+    // region maybe desperated at the end of 2019  
+    onDataRendered: function () { },
+    onDrawOne: function () { },
+    onSelect: function () { },
+    // endregion
+};
+    ```
+2. 优化性能问题。
+
+### ver2.0.1
 ---
 1. 重组结构，增加默认配置。
 2. 修复图像宽高在某些情况下，在导致内部变量不更新的问题。
 3. 支持图片高度超出屏幕后进行标注。
 4. 重新编写VMarker项目中使用的API。
+5. 修复bug
 
 
 ### ver1.3.8
