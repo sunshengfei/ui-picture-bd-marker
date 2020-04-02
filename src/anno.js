@@ -95,20 +95,24 @@ export default class ResizeAnnotation {
         if (dataArray instanceof Array && dataArray.length > 0) {
             dataArray.forEach((data, index, arr) => {
                 let rect;
-                if (data.position.x.endsWith('%')) {
-                    rect = {
-                        x: data.position.x,
-                        y: data.position.y,
-                        width: (parseFloat(data.position.x1) - parseFloat(data.position.x)) + '%',
-                        height: (parseFloat(data.position.y1) - parseFloat(data.position.y)) + '%'
-                    }
-                } else {
+                if (!isNaN(data.position.x)) {
                     rect = {
                         x: (100 * data.position.x / base.width).toFixed(3) + '%',
                         y: (100 * data.position.y / base.height).toFixed(3) + '%',
                         width: (100 * (data.position.x1 - data.position.x) / base.width).toFixed(3) + '%',
                         height: (100 * (data.position.y1 - data.position.y) / base.height).toFixed(3) + '%'
                     };
+                } else {
+                    if (data.position.x.endsWith('%')) {
+                        rect = {
+                            x: data.position.x,
+                            y: data.position.y,
+                            width: (parseFloat(data.position.x1) - parseFloat(data.position.x)) + '%',
+                            height: (parseFloat(data.position.y1) - parseFloat(data.position.y)) + '%'
+                        }
+                    } else {
+                        return
+                    }
                 }
                 this.drawAnnotation(rect, data);
             });
