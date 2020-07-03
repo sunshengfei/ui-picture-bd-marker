@@ -2,7 +2,7 @@
 
 效果图：
 
-![](https://snackblogs.sagocloud.com/ibucket/vm_sample.jpg)
+![](https://sagocloud.com/ibucket/vm_sample.jpg)
 
 安装依赖
 
@@ -11,9 +11,25 @@ npm install ui-picture-bd-marker -D
 
 ```
 
-源码仓库：[https://github.com/FRED5DON/ui-picture-bd-marker](https://github.com/FRED5DON/ui-picture-bd-marker)
+源码仓库：[https://github.com/sunshengfei/ui-picture-bd-marker](https://github.com/sunshengfei/ui-picture-bd-marker)
 
 文档地址 ：[https://vmarker.sagocloud.com/diy/](https://vmarker.sagocloud.com/diy/#upbm)
+
+
+### ver2.1.0
+---
+
+1. 修复键盘删除失效问题
+2. 增加Mobile支持
+3. defaultConfig增加设备标识 （mouse | touch ，鼠标或指针设备|触摸设备）
+
+```
+options: {
+   deviceType: 'both',//both | mouse | touch
+}
+```
+
+
 ### ver2.0.2 - beta版 (注意兼容性问题)
 ---
 

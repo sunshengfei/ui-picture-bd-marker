@@ -23,6 +23,7 @@
 'use strict';
 import {
     MOUSE_EVENT,
+    TOUCH_EVENT,
     dotCls,
     imageOpTag,
     PREFIX_RESIZE_DOT,
@@ -46,22 +47,22 @@ export default class ResizeAnnotation {
         this.currentMovement = null;
         this.rawConfig = { ...defaultConfig, ...callback };
         this.data = [];
-        this.setConfigOptions(this.rawConfig)
+        if (this.options.supportDelKey) {
+            let that = this
+            document.onkeydown = function (e) {
+                if (e.keyCode === 8 || e.keyCode === 46) {
+                    let currentMovement = that.currentMovement
+                    if (currentMovement) {
+                        that.removeAnnotation(currentMovement.moveNode);
+                    }
+                }
+            };
+        }
     }
 
     setConfigOptions = (newOptions) => {
         this.options = { ...this.options, ...newOptions.options };
         this.rawConfig = { ...this.rawConfig, ...newOptions };
-        if (this.options.supportDelKey) {
-            document.onkeydown = (e) => {
-                if (e.keyCode === 8 || e.keyCode === 46) {
-                    let { moveNode } = this.currentMovement || {};
-                    if (moveNode) {
-                        this.removeAnnotation(moveNode);
-                    }
-                }
-            };
-        }
     }
 
     //获取数据模板
@@ -95,24 +96,20 @@ export default class ResizeAnnotation {
         if (dataArray instanceof Array && dataArray.length > 0) {
             dataArray.forEach((data, index, arr) => {
                 let rect;
-                if (!isNaN(data.position.x)) {
+                if (data.position.x.endsWith('%')) {
+                    rect = {
+                        x: data.position.x,
+                        y: data.position.y,
+                        width: (parseFloat(data.position.x1) - parseFloat(data.position.x)) + '%',
+                        height: (parseFloat(data.position.y1) - parseFloat(data.position.y)) + '%'
+                    }
+                } else {
                     rect = {
                         x: (100 * data.position.x / base.width).toFixed(3) + '%',
                         y: (100 * data.position.y / base.height).toFixed(3) + '%',
                         width: (100 * (data.position.x1 - data.position.x) / base.width).toFixed(3) + '%',
                         height: (100 * (data.position.y1 - data.position.y) / base.height).toFixed(3) + '%'
                     };
-                } else {
-                    if (data.position.x.endsWith('%')) {
-                        rect = {
-                            x: data.position.x,
-                            y: data.position.y,
-                            width: (parseFloat(data.position.x1) - parseFloat(data.position.x)) + '%',
-                            height: (parseFloat(data.position.y1) - parseFloat(data.position.y)) + '%'
-                        }
-                    } else {
-                        return
-                    }
                 }
                 this.drawAnnotation(rect, data);
             });
@@ -196,9 +193,9 @@ export default class ResizeAnnotation {
             let oldValue = Object.assign({}, value);
             if (value.tag === tag && value.uuid === uuid) {
                 value.position = position;
-                this.data[i] = value;
-                this.rawConfig.onAnnoChanged(value, oldValue);
             }
+            this.data[i] = value;
+            this.rawConfig.onAnnoChanged(value, oldValue);
         }
         this.rawConfig.onUpdated(this.dataSource(), this.currentMovement);
     };
@@ -348,19 +345,25 @@ export default class ResizeAnnotation {
         // e.preventDefault();
         // e.stopPropagation();
         // if (!e.target.classList.contains('annotation') &&
-        //     !e.target.classList.contains(`${PREFIX_RESIZE_DOT}`)) {
+        // !e.target.classList.contains(`${PREFIX_RESIZE_DOT}`)) {
         //     eventTargetOnTransform = false;
         //   }
         const eventType = e.type;
+        // console.log(`eventType=${eventType}`);
         if (eventType === MOUSE_EVENT[6]) {
             this.selectAnnotation();
             return;
         }
         let clientX = e.clientX,
             clientY = e.clientY;
+        if (e.targetTouches && e.targetTouches.length > 0) {
+            let touch = e.targetTouches[0]
+            clientX = touch ? touch.clientX : undefined
+            clientY = touch ? touch.clientY : undefined
+        }
         this.moveX = clientX;//- this.boundRect().x;
         this.moveY = clientY;//- this.boundRect().y;
-        if (eventType === MOUSE_EVENT[0]) {
+        if (eventType === MOUSE_EVENT[0] || eventType === TOUCH_EVENT[0]) {
             this.actionDown = true;
             this.lastX = this.moveX;
             this.lastY = this.moveY;
@@ -370,7 +373,8 @@ export default class ResizeAnnotation {
             // eventTargetOnTransform = true;
             this.targetEventType(e);
         } else if (eventType === MOUSE_EVENT[1] || eventType === MOUSE_EVENT[3] || eventType ===
-            MOUSE_EVENT[5]) {
+            MOUSE_EVENT[5] || eventType === TOUCH_EVENT[1] || eventType === TOUCH_EVENT[3] || eventType === TOUCH_EVENT[5]
+        ) {
             if (this.currentMovement == null) {
                 return true;
             }

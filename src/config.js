@@ -32,6 +32,15 @@ export const MOUSE_EVENT = [
     'contextmenu'
 ];
 
+export const TOUCH_EVENT = [
+    'touchstart',
+    'touchmove',
+    'touchend',
+    'touchcancel',
+    'touchup',
+    'touchleave'
+];
+
 export const defaultPositions = {
     bottom: 0x01,
     out_bottom: 0x02,
@@ -39,7 +48,8 @@ export const defaultPositions = {
 
 export const defaultConfig = {
     options: {
-        blurOtherDots: true,
+        deviceType: 'both',//both | mouse | touch
+        blurOtherDots: false,
         blurOtherDotsShowTags: false,
         editable: true,
         showTags: true,
@@ -49,23 +59,17 @@ export const defaultConfig = {
         boundReachPercent: 0.01,
         annotationClass: 'annotation',
     },
-    onAnnoContextMenu: function (annoData, element, annoContext) { console.log('onAnnoContextMenu') },
-    onAnnoRemoved: function (annoData, element) {
-        console.log('onAnnoRemoved')
-        return true
-    },
-    onAnnoAdded: function (insertItem, element) {
-        console.log('onAnnoAdded')
-    },
-    onAnnoChanged: function (newValue, oldValue) { console.log('onAnnoChanged') },
-    onAnnoDataFullLoaded: function () { console.log('onAnnoDataFullLoaded') },
-    onAnnoSelected: function (value, element) { console.log('onAnnoSelected') },
-    onUpdated: function () { console.log('onUpdated') },
-    // region maybe desperated at the end of 2019  
+    onAnnoContextMenu: function (annoData, element, annoContext) { },
+    onAnnoRemoved: function (annoData, element) { return true },
+    onAnnoAdded: function (insertItem, element) { },
+    onAnnoChanged: function (newValue, oldValue) { },
+    onAnnoDataFullLoaded: function () { },
+    onAnnoSelected: function (value, element) { },
+    onUpdated: function () { },
+    //==== old 
     onDataRendered: function () { },
     onDrawOne: function () { },
     onSelect: function () { },
-    // endregion
 };
 
 export const imageOpTag = 'g-image-op-name'
