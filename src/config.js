@@ -48,7 +48,7 @@ export const defaultPositions = {
 
 export const defaultConfig = {
     options: {
-        deviceType: 'both',// both | mouse | touch
+        deviceType: 'both',//both | mouse | touch
         blurOtherDots: false,
         blurOtherDotsShowTags: false,
         editable: true,

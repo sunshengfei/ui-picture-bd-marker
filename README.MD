@@ -15,6 +15,9 @@ npm install ui-picture-bd-marker -D
 
 文档地址 ：[https://vmarker.sagocloud.com/diy/](https://vmarker.sagocloud.com/diy/#upbm)
 
+### ver2.3.1
+---
+1. 修复在IE下部分ES2015方法兼容问题
 
 ### ver2.3.0
 ---
