@@ -16,6 +16,19 @@ npm install ui-picture-bd-marker -D
 文档地址 ：[https://vmarker.sagocloud.com/diy/](https://vmarker.sagocloud.com/diy/#upbm)
 
 
+### ver2.3.0
+---
+1. 修复调用marker的`setConfigOptions`方法不及时生效问题
+2. options中`supportDelKey`修改默认值为`false`
+3. 移除config中过时的回调方法，如下：
+
+```
+    onDataRendered: function () { },
+    onDrawOne: function () { },
+    onSelect: function () { },
+```
+
+
 ### ver2.1.0
 ---
 

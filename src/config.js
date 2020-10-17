@@ -48,12 +48,12 @@ export const defaultPositions = {
 
 export const defaultConfig = {
     options: {
-        deviceType: 'both',//both | mouse | touch
+        deviceType: 'both',// both | mouse | touch
         blurOtherDots: false,
         blurOtherDotsShowTags: false,
         editable: true,
         showTags: true,
-        supportDelKey: true,
+        supportDelKey: false,
         tagLocation: defaultPositions.bottom,
         trashPositionStart: 0,
         boundReachPercent: 0.01,
@@ -66,13 +66,10 @@ export const defaultConfig = {
     onAnnoDataFullLoaded: function () { },
     onAnnoSelected: function (value, element) { },
     onUpdated: function () { },
-    //==== old 
-    onDataRendered: function () { },
-    onDrawOne: function () { },
-    onSelect: function () { },
 };
 
 export const imageOpTag = 'g-image-op-name'
+export const imageOpContent = 'g-image-op-content'
 
 export const PREFIX_RESIZE_DOT = 'resize-dot';
 
