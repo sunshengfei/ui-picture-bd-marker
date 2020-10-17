@@ -1,5 +1,5 @@
 {
-  "name": "ui-picture-bd-marker",
+  "name": "@sunshengfei/ui-picture-bd-marker",
   "version": "2.3.1",
   "description": "高仿百度AI图像物体检测标注控件",
   "main": "index.js",
