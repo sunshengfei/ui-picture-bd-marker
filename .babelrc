@@ -1,7 +1,9 @@
 {
   "presets": [
-    "es2015",
-    "stage-2"
+    "@babel/preset-env"
+  ],
+  "plugins": [
+    "@babel/plugin-proposal-class-properties"
   ],
   "comments": true
 }

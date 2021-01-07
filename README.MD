@@ -1,5 +1,7 @@
 ## 高仿百度AI图像物体检测标注控件
 
+![](https://img.shields.io/github/license/sunshengfei/ui-picture-bd-marker) ![](https://img.shields.io/npm/v/ui-picture-bd-marker.svg?color=%23ff4400&style=popout)
+
 效果图：
 
 ![](https://sagocloud.com/ibucket/vm_sample.jpg)
@@ -15,9 +17,15 @@ npm install ui-picture-bd-marker -D
 
 文档地址 ：[https://vmarker.sagocloud.com/diy/](https://vmarker.sagocloud.com/diy/#upbm)
 
-### ver2.3.1
+### ver2.3.3
+---
+1. 修复右键oncontextmenu事件，当鼠标在tag标签报错问题
+2. onAnnoContextMenu事件的第二个参数（触发元素），修改为当前绑定oncontextmenu的元素，即 e.target 变为 e.currentTarget
+
+### ver2.3.2
 ---
 1. 修复在IE下部分ES2015方法兼容问题
+2. 修复在React引用下UI显示不及时响应的问题
 
 ### ver2.3.0
 ---
