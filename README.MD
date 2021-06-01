@@ -17,6 +17,18 @@ npm install ui-picture-bd-marker -D
 
 文档地址 ：[https://vmarker.sagocloud.com/diy/](https://vmarker.sagocloud.com/diy/#upbm)
 
+### ver2.3.5
+
+1. options增加`closable`是否可以关闭（删除）属性
+如：
+```
+marker.setConfigOptions({
+ options:{closable: false}
+})
+```
+2. options增加`textComponent`，用于自定义标签UI显示,接受类型为`Element`
+3. 移除不必要的属性
+
 ### ver2.3.3
 ---
 1. 修复右键oncontextmenu事件，当鼠标在tag标签报错问题

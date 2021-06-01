@@ -39,7 +39,7 @@ export default class ResizeAnnotation {
     }
 
     _event = () => {
-        if (this.options.supportDelKey) {
+        if (this.options.supportDelKey && this.options.closable) {
             document.addEventListener("keydown", this.delEvent)
         } else {
             document.removeEventListener("keydown", this.delEvent)
@@ -61,6 +61,32 @@ export default class ResizeAnnotation {
                     opContent.style.bottom = null;
                 } else {
                     opContent.style.position = null;
+                }
+                let delEl = opContent.querySelector('.g-image-op-del')
+                if (delEl) {
+                    if (this.options.closable) {
+                        delEl.style.display = ''
+                    } else {
+                        delEl.style.display = "none"
+                    }
+                }
+                if (this.options.textComponent) {
+                    let element = this.options.textComponent.apply(null, [opContent])
+                    if (!element) {
+                        //默认
+                        return
+                    }
+                    if (!(element instanceof Element)) {
+                        throw new Error("closeComponent not a Element")
+                    }
+                    if (opContent.hasChildNodes()) {
+                        let opChildren = opContent.childNodes;
+                        for (let index = opChildren.length - 1; index > -1; index--) {
+                            const rmEl = opChildren[index];
+                            rmEl && opContent.removeChild(rmEl)
+                        }
+                        opContent.appendChild(element)
+                    }
                 }
             }
         }
@@ -322,6 +348,11 @@ export default class ResizeAnnotation {
                 trash.className = 'g-image-op-del iconfont s-icon icon-trash s-icon-trash';
                 trash.innerText = ' × ';
                 trash.addEventListener('click', this._removeAnnotationEvent, true);
+                if (!this.options.closable) {
+                    trash.style.display = 'none'
+                } else {
+                    trash.style.display = ''
+                }
                 let tag = document.createElement('span');
                 tag.dataset.name = tagString;
                 tag.className = `${imageOpTag}`;
@@ -462,8 +493,9 @@ export default class ResizeAnnotation {
             }
             if (!isUserinteracted) return;
             const node = this.currentMovement.moveNode;
-            const tag_str = node.querySelector(`.${imageOpTag}`).innerText;
-            const tagAttr = node.querySelector(`.${imageOpTag}`).dataset;
+            const ln = node.querySelector(`.${imageOpTag}`);
+            const tag_str = ln.innerText;
+            const tagAttr = ln.dataset;
             let selectData = {
                 ...tagAttr,
                 ...this.dataSourceOfTag(tagAttr.id, node.dataset.uuid),

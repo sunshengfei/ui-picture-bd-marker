@@ -10,8 +10,12 @@ import {
 import ResizeAnnotation from './anno';
 
 class BdAIMarker {
-  eventTargetOnTransform = false;
-
+  #eventTargetOnTransform = false;
+  #moveX;
+  #moveY;
+  #anchorX;
+  #anchorY;
+  #actionDown;
   constructor(layer, draft, resizeAnnotation, configs = {}) {
     if (typeof configs !== 'object') {
       throw new Error('Please provide a callback Config for BdAIMarker');
@@ -20,15 +24,15 @@ class BdAIMarker {
     if (layer) {
       this.layer = layer;
       this.draft = draft;
-      this.actionDown = false;
+      this.#actionDown = false;
       this.draftRect = {};
-      this.anchorX = -1;
-      this.anchorY = -1;
+      this.#anchorX = -1;
+      this.#anchorY = -1;
       this.boundRect = () => {
         return layer.getBoundingClientRect();
       };
       this.resizeAnnotation = resizeAnnotation ? resizeAnnotation : new ResizeAnnotation(
-        draft.parentNode, this._compatibalBoundRect, configs, this.$callback_handler);
+        draft.parentNode, this.#compatibalBoundRect, configs, this.#callback_handler);
       let self = this;
       if (this.options.deviceType == 'both' || this.options.deviceType == 'mouse') {
         MOUSE_EVENT.forEach((currentValue, index, arr) => {
@@ -38,7 +42,7 @@ class BdAIMarker {
             }
             let x = e.clientX,
               y = e.clientY;
-            self.mouseEventHandler(e, x, y);
+            self.#mouseEventHandler(e, x, y);
           }, true);
         });
       }
@@ -53,7 +57,7 @@ class BdAIMarker {
               let touch = e.targetTouches[0]
               let x = touch ? touch.clientX : undefined,
                 y = touch ? touch.clientY : undefined;
-              self.mouseEventHandler(e, x, y);
+              self.#mouseEventHandler(e, x, y);
             }
           }, true);
         });
@@ -61,8 +65,8 @@ class BdAIMarker {
     }
   }
 
-  $callback_handler = (onTrans) => {
-    this.eventTargetOnTransform = onTrans;
+  #callback_handler = (onTrans) => {
+    this.#eventTargetOnTransform = onTrans;
   }
 
   setConfigOptions = (newOptions) => {
@@ -72,7 +76,7 @@ class BdAIMarker {
     }
   }
 
-  _compatibalBoundRect = () => {
+  #compatibalBoundRect = () => {
     let boundRect = this.boundRect();
     if (typeof boundRect.x != 'undefined') return boundRect;
     return {
@@ -87,63 +91,63 @@ class BdAIMarker {
     }
   }
 
-  mouseEventHandler = (e, clientX, clientY) => {
+  #mouseEventHandler = (e, clientX, clientY) => {
     // e.preventDefault();
     // e.stopPropagation();
     let eventType = e.type;
-    let boundRect = this._compatibalBoundRect();
+    let boundRect = this.#compatibalBoundRect();
     if (clientX) {
-      this.moveX = clientX - boundRect.x;
+      this.#moveX = clientX - boundRect.x;
     }
     if (clientY) {
-      this.moveY = clientY - boundRect.y;
+      this.#moveY = clientY - boundRect.y;
     }
     if (eventType === MOUSE_EVENT[6]) {
-      this.eventTargetOnTransform = false;
-      this.actionDown = false;
+      this.#eventTargetOnTransform = false;
+      this.#actionDown = false;
       this.resizeAnnotation.dragEventOn(e);
       return;
     }
-    if (this.eventTargetOnTransform) {
+    if (this.#eventTargetOnTransform) {
       this.resizeAnnotation.dragEventOn(e);
       return;
     }
     if (eventType === MOUSE_EVENT[0] || eventType === TOUCH_EVENT[0]) {
       if (e.target.classList.contains(this.options.annotationClass) ||
         e.target.classList.contains(`${PREFIX_RESIZE_DOT}`)) {
-        this.eventTargetOnTransform = true;
+        this.#eventTargetOnTransform = true;
         this.resizeAnnotation.dragEventOn(e);
         return;
       }
-      if (this.actionDown) {
-        this.dragTo(this.moveX, this.moveY);
+      if (this.#actionDown) {
+        this.#dragTo(this.#moveX, this.#moveY);
         return;
       }
       this.resizeAnnotation.removeSelectedAnnotation()
-      this.actionDown = true;
-      this.anchorX = this.moveX;
-      this.anchorY = this.moveY;
+      this.#actionDown = true;
+      this.#anchorX = this.#moveX;
+      this.#anchorY = this.#moveY;
       this.resetDraft();
-      this.anchorAt(this.anchorX, this.anchorY);
+      this.#anchorAt(this.#anchorX, this.#anchorY);
     } else if (eventType === MOUSE_EVENT[1] || eventType === TOUCH_EVENT[1]) {
-      if (this.actionDown) {
-        this.dragTo(this.moveX, this.moveY);
+      if (this.#actionDown) {
+        this.#dragTo(this.#moveX, this.#moveY);
       }
     } else if (eventType === MOUSE_EVENT[4] || eventType === TOUCH_EVENT[2] || eventType === TOUCH_EVENT[4]) {
-      if (this.actionDown && this.resizeAnnotation) {
+      if (this.#actionDown && this.resizeAnnotation) {
         this.resizeAnnotation.drawAnnotation(this.draftRect);
         this.resetDraft();
       }
-      this.actionDown = false;
+      this.#actionDown = false;
     } else {
-      if (this.actionDown && this.filterOutOfBounds(this.moveX, this.moveY)) {
+      if (this.#actionDown && this.#filterOutOfBounds(this.#moveX, this.#moveY)) {
         // console.log(`eventType=${eventType}`);
         // console.log(this.draftRect);
         if (this.resizeAnnotation) {
           this.resizeAnnotation.drawAnnotation(this.draftRect);
           this.resetDraft();
         }
-        this.actionDown = false;
+        this.#actionDown = false;
       }
     }
     // console.log(`eventType=${eventType}`);
@@ -151,17 +155,17 @@ class BdAIMarker {
 
 
   //  更新定位点
-  anchorAt = (x, y) => {
+  #anchorAt = (x, y) => {
     if (!this.options.editable) return;
-    let ccRect = this._compatibalBoundRect()
+    let ccRect = this.#compatibalBoundRect()
     this.draft.style.display = '';
-    if (this.moveX < x) {
+    if (this.#moveX < x) {
       this.draft.style.right = 100 * Math.abs(ccRect.width - x) / ccRect.width +
         '%';
       this.draft.style.left = '';
       this.draftRect = Object.assign(this.draftRect,
         {
-          x: (100 * Math.abs(this.moveX) / ccRect.width).toFixed(3) + '%',
+          x: (100 * Math.abs(this.#moveX) / ccRect.width).toFixed(3) + '%',
         });
     } else {
       this.draft.style.left = (100 * Math.abs(x) / ccRect.width).toFixed(3) + '%';
@@ -171,14 +175,14 @@ class BdAIMarker {
           x: (100 * Math.abs(x) / ccRect.width).toFixed(3) + '%',
         });
     }
-    if (this.moveY < y) {
+    if (this.#moveY < y) {
       this.draft.style.bottom = (100 * Math.abs(ccRect.height - y) /
         ccRect.height).toFixed(3) +
         '%';
       this.draft.style.top = '';
       this.draftRect = Object.assign(this.draftRect,
         {
-          y: (100 * Math.abs(this.moveY) / ccRect.height).toFixed(3) + '%',
+          y: (100 * Math.abs(this.#moveY) / ccRect.height).toFixed(3) + '%',
         });
     } else {
       this.draft.style.top = (100 * Math.abs(y) / ccRect.height).toFixed(3) + '%';
@@ -190,12 +194,12 @@ class BdAIMarker {
     }
   };
 
-  filterOutOfBounds = (x, y) => {
+  #filterOutOfBounds = (x, y) => {
     return (
-      x >= this._compatibalBoundRect().width ||
-      // x >= this._compatibalBoundRect().x + this._compatibalBoundRect().width + 2 ||
-      y >= this._compatibalBoundRect().height ||
-      // y >= this._compatibalBoundRect().y + this._compatibalBoundRect().height + 2 ||
+      x >= this.#compatibalBoundRect().width ||
+      // x >= this.#compatibalBoundRect().x + this.#compatibalBoundRect().width + 2 ||
+      y >= this.#compatibalBoundRect().height ||
+      // y >= this.#compatibalBoundRect().y + this.#compatibalBoundRect().height + 2 ||
       x < 1 || y < 1
     );
   };
@@ -218,14 +222,14 @@ class BdAIMarker {
     this.renderData(void 0)
   };
 
-  dragTo = (x, y) => {
+  #dragTo = (x, y) => {
     if (!this.options.editable) return;
-    if (this.filterOutOfBounds(x, y)) {
-      this.actionDown = false;
+    if (this.#filterOutOfBounds(x, y)) {
+      this.#actionDown = false;
     }
-    this.anchorAt(this.anchorX, this.anchorY);
-    let widthRatio = (100 * Math.abs(x - this.anchorX) / this._compatibalBoundRect().width).toFixed(3);
-    let heightRatio = (100 * Math.abs(y - this.anchorY) / this._compatibalBoundRect().height).toFixed(3);
+    this.#anchorAt(this.#anchorX, this.#anchorY);
+    let widthRatio = (100 * Math.abs(x - this.#anchorX) / this.#compatibalBoundRect().width).toFixed(3);
+    let heightRatio = (100 * Math.abs(y - this.#anchorY) / this.#compatibalBoundRect().height).toFixed(3);
     this.draftRect = Object.assign(this.draftRect,
       {
         width: widthRatio + '%',
@@ -290,3 +294,11 @@ export {
   positionP2S,
   transformDataArray,
 };
+
+BdAIMarker.prototype.util = {
+  UUID,
+  positionP2S,
+  transformDataArray
+}
+
+export default BdAIMarker
