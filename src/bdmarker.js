@@ -8,6 +8,7 @@ import {
   UUID, positionP2S, transformDataArray
 } from './config';
 import ResizeAnnotation from './anno';
+import Movement from './movement';
 
 class BdAIMarker {
   #eventTargetOnTransform = false;
@@ -16,6 +17,8 @@ class BdAIMarker {
   #anchorX;
   #anchorY;
   #actionDown;
+  #resizeAnnotation;
+  #draftAnnoData;
   constructor(layer, draft, resizeAnnotation, configs = {}) {
     if (typeof configs !== 'object') {
       throw new Error('Please provide a callback Config for BdAIMarker');
@@ -31,7 +34,7 @@ class BdAIMarker {
       this.boundRect = () => {
         return layer.getBoundingClientRect();
       };
-      this.resizeAnnotation = resizeAnnotation ? resizeAnnotation : new ResizeAnnotation(
+      this.#resizeAnnotation = resizeAnnotation ? resizeAnnotation : new ResizeAnnotation(
         draft.parentNode, this.#compatibalBoundRect, configs, this.#callback_handler);
       let self = this;
       if (this.options.deviceType == 'both' || this.options.deviceType == 'mouse') {
@@ -71,8 +74,8 @@ class BdAIMarker {
 
   setConfigOptions = (newOptions) => {
     this.options = { ...this.options, ...newOptions.options }
-    if (this.resizeAnnotation) {
-      this.resizeAnnotation.setConfigOptions(newOptions);
+    if (this.#resizeAnnotation) {
+      this.#resizeAnnotation.setConfigOptions(newOptions);
     }
   }
 
@@ -105,25 +108,26 @@ class BdAIMarker {
     if (eventType === MOUSE_EVENT[6]) {
       this.#eventTargetOnTransform = false;
       this.#actionDown = false;
-      this.resizeAnnotation.dragEventOn(e);
+      this.#resizeAnnotation.dispatchEventToAnno(e);
       return;
     }
     if (this.#eventTargetOnTransform) {
-      this.resizeAnnotation.dragEventOn(e);
+      this.#resizeAnnotation.dispatchEventToAnno(e);
       return;
     }
     if (eventType === MOUSE_EVENT[0] || eventType === TOUCH_EVENT[0]) {
       if (e.target.classList.contains(this.options.annotationClass) ||
         e.target.classList.contains(`${PREFIX_RESIZE_DOT}`)) {
         this.#eventTargetOnTransform = true;
-        this.resizeAnnotation.dragEventOn(e);
+        this.#resizeAnnotation.dispatchEventToAnno(e);
         return;
       }
       if (this.#actionDown) {
         this.#dragTo(this.#moveX, this.#moveY);
         return;
       }
-      this.resizeAnnotation.removeSelectedAnnotation()
+      this.#draftAnnoData = Movement.tagTemplate()
+      this.#resizeAnnotation.removeSelectedAnnotation()
       this.#actionDown = true;
       this.#anchorX = this.#moveX;
       this.#anchorY = this.#moveY;
@@ -134,8 +138,8 @@ class BdAIMarker {
         this.#dragTo(this.#moveX, this.#moveY);
       }
     } else if (eventType === MOUSE_EVENT[4] || eventType === TOUCH_EVENT[2] || eventType === TOUCH_EVENT[4]) {
-      if (this.#actionDown && this.resizeAnnotation) {
-        this.resizeAnnotation.drawAnnotation(this.draftRect);
+      if (this.#actionDown && this.#resizeAnnotation) {
+        this.#resizeAnnotation.drawAnnotation(this.draftRect, this.#draftAnnoData);
         this.resetDraft();
       }
       this.#actionDown = false;
@@ -143,8 +147,8 @@ class BdAIMarker {
       if (this.#actionDown && this.#filterOutOfBounds(this.#moveX, this.#moveY)) {
         // console.log(`eventType=${eventType}`);
         // console.log(this.draftRect);
-        if (this.resizeAnnotation) {
-          this.resizeAnnotation.drawAnnotation(this.draftRect);
+        if (this.#resizeAnnotation) {
+          this.#resizeAnnotation.drawAnnotation(this.draftRect, this.#draftAnnoData);
           this.resetDraft();
         }
         this.#actionDown = false;
@@ -244,7 +248,7 @@ class BdAIMarker {
    * 渲染数据
    */
   renderData = (dataArray = [], base) => {
-    let ra = this.resizeAnnotation;
+    let ra = this.#resizeAnnotation;
     if (ra) {
       ra.renderData(dataArray, base);
     }
@@ -258,14 +262,14 @@ class BdAIMarker {
    * }
    */
   setTag = (tag) => {
-    if (this.resizeAnnotation && tag) {
-      this.resizeAnnotation.setTagForCurrentMovement(tag);
+    if (this.#resizeAnnotation && tag) {
+      this.#resizeAnnotation.setTagForCurrentMovement(tag);
     }
   };
 
   selectMarkerByTagId = (tagId) => {
     if (tagId) {
-      this.resizeAnnotation.selectMarkerByTagId(tagId);
+      this.#resizeAnnotation.selectMarkerByTagId(tagId);
     }
   };
 
@@ -273,8 +277,8 @@ class BdAIMarker {
    * 获取所有数据
    */
   dataSource = () => {
-    if (this.resizeAnnotation) {
-      return this.resizeAnnotation.dataSource();
+    if (this.#resizeAnnotation) {
+      return this.#resizeAnnotation.dataSource();
     }
     return void 0;
   };
@@ -283,7 +287,15 @@ class BdAIMarker {
    * 获取某个标签的数据
    */
   dataForTag = (tagId, uuid) => {
-    return this.resizeAnnotation.dataSourceOfTag(tagId, uuid);
+    return this.#resizeAnnotation.dataSourceOfTag(tagId, uuid);
+  }
+
+  /**
+   * 获取当前标注管理mannager
+   * @returns 
+   */
+  getAnnotation = () => {
+    return this.#resizeAnnotation
   }
 }
 

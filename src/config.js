@@ -45,7 +45,7 @@ export const defaultConfig = {
     onAnnoChanged: function (newValue, oldValue) { },
     onAnnoDataFullLoaded: function () { },
     onAnnoSelected: function (value, element) { },
-    onUpdated: function () { },
+    onUpdated: function (data, movement) { },
 };
 
 export const imageOpTag = 'g-image-op-name'
