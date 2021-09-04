@@ -1,14 +1,6 @@
 'use strict';
 
 import {
-  MOUSE_EVENT,
-  TOUCH_EVENT,
-  dotCls,
-  imageOpTag,
-  imageOpContent,
-  PREFIX_RESIZE_DOT,
-  defaultPositions,
-  defaultConfig,
   UUID
 } from './config';
 

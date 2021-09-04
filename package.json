@@ -1,6 +1,6 @@
 {
-  "name": "ui-picture-bd-marker",
-  "version": "2.3.5",
+  "name": "@sunshengfei/ui-picture-bd-marker",
+  "version": "2.3.7",
   "description": "高仿百度AI图像物体检测标注控件",
   "main": "index.js",
   "scripts": {
@@ -20,6 +20,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sunshengfei/ui-picture-bd-marker"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",

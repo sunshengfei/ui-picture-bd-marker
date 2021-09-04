@@ -1,0 +1,148 @@
+%dotted {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  display: inline-block;
+  width: auto;
+  height: auto;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.resize-dot {
+  position: absolute;
+  width: auto;
+  height: auto;
+  min-width: 12px;
+  min-height: 12px;
+  border-radius: 2px;
+  background: rgb(255, 255, 255);
+  box-sizing: border-box;
+
+  &-n {
+    position: absolute;
+    cursor: n-resize;
+    height: 12px;
+    top: -6px;
+    left: 40%;
+    right: 40%;
+
+    &::after {
+      @extend %dotted;
+      line-height: 12px;
+      border-top: 5px dotted white;
+      border-bottom: 5px dotted white;
+    }
+  }
+
+  &-s {
+    position: absolute;
+    cursor: s-resize;
+    height: 12px;
+    bottom: -6px;
+    left: 40%;
+    right: 40%;
+
+    &::after {
+      @extend %dotted;
+      line-height: 12px;
+      border-top: 5px dotted white;
+      border-bottom: 5px dotted white;
+    }
+  }
+
+  &-w {
+    position: absolute;
+    cursor: w-resize;
+    width: 12px;
+    left: -6px;
+    top: 40%;
+    bottom: 40%;
+
+    &::after {
+      @extend %dotted;
+      line-height: 12px;
+      border-left: 5px dotted white;
+      border-right: 5px dotted white;
+    }
+  }
+
+  &-e {
+    position: absolute;
+    cursor: e-resize;
+    width: 12px;
+    right: -6px;
+    top: 40%;
+    bottom: 40%;
+
+    &::after {
+      @extend %dotted;
+      line-height: 12px;
+      border-left: 5px dotted white;
+      border-right: 5px dotted white;
+    }
+  }
+
+  &-nw,
+  &-ne,
+  &-sw,
+  &-se {
+    &::after {
+      @extend %dotted;
+      line-height: 12px;
+      border-top: 5px dotted white;
+      border-bottom: 5px dotted white;
+    }
+  }
+
+  &-nw {
+    position: absolute;
+    cursor: nw-resize;
+    width: 12px;
+    height: 12px;
+    margin-top: -6px;
+    margin-left: -6px;
+  }
+
+  &-ne {
+    position: absolute;
+    cursor: ne-resize;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    margin-top: -6px;
+    margin-right: -6px;
+  }
+
+  &-sw {
+    position: absolute;
+    cursor: sw-resize;
+    bottom: 0;
+    width: 12px;
+    height: 12px;
+    margin-left: -6px;
+    margin-bottom: -6px;
+  }
+
+  &-se {
+    position: absolute;
+    cursor: se-resize;
+    bottom: 0;
+    width: 12px;
+    height: 12px;
+    right: 0;
+    margin-bottom: -6px;
+    margin-right: -6px;
+  }
+}
+
+.g-image-op-content {
+  line-height: 20px;
+  height: 20px;
+
+  .g-image-op-name {
+    font-size: 12px;
+  }
+}

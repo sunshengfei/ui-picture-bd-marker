@@ -4,7 +4,7 @@
 
 效果图：
 
-![](https://sagocloud.com/ibucket/vm_sample.jpg)
+![](https://github.com/sunshengfei/ui-picture-bd-marker/blob/master/demo.png?raw=true)
 
 安装依赖
 
@@ -16,6 +16,13 @@ npm install ui-picture-bd-marker -D
 源码仓库：[https://github.com/sunshengfei/ui-picture-bd-marker](https://github.com/sunshengfei/ui-picture-bd-marker)
 
 文档地址 ：[https://vmarker.sagocloud.com/diy/](https://vmarker.sagocloud.com/diy/#upbm)
+
+### ver2.3.7
+
+1. 取消标注区域最小限定，任意宽度都能进行标画和render
+2. 如果使用`vue-picture-bd-marker`组件，支持长图模式，外部可以套div进行overflow，只需要在vue组件设置width和ratio组合值即可
+   1. width:auto 容器宽度将会使用原有图像宽度
+   2. ratio:0    使用原图像缩放比
 
 ### ver2.3.5
 

@@ -1,0 +1,232 @@
+.annotation {
+  cursor: move;
+  border: 1px solid #3e3e3e;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.selected {
+  background: rgba(89, 190, 244, 0.3);
+}
+
+.hidden {
+  display: none;
+}
+
+.resize-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+.resize-dot-n {
+  position: absolute;
+  cursor: n-resize;
+  top: -4px;
+  left: 50%;
+  margin-left: -4px;
+}
+
+.resize-dot-s {
+  position: absolute;
+  cursor: s-resize;
+  bottom: -4px;
+  left: 50%;
+  margin-left: -4px;
+}
+
+.resize-dot-w {
+  position: absolute;
+  cursor: w-resize;
+  left: -4px;
+  top: 50%;
+  margin-top: -4px;
+}
+
+.resize-dot-e {
+  position: absolute;
+  cursor: e-resize;
+  right: -4px;
+  top: 50%;
+  margin-top: -4px;
+}
+
+.resize-dot-nw {
+  position: absolute;
+  cursor: nw-resize;
+  margin-top: -4px;
+  margin-left: -4px;
+}
+
+.resize-dot-ne {
+  position: absolute;
+  cursor: ne-resize;
+  right: 0;
+  margin-top: -4px;
+  margin-right: -4px;
+}
+
+.resize-dot-sw {
+  position: absolute;
+  cursor: sw-resize;
+  bottom: 0;
+  margin-left: -4px;
+  margin-bottom: -4px;
+}
+
+.resize-dot-se {
+  cursor: se-resize;
+  right: -4px;
+  bottom: 0;
+  margin-bottom: -4px;
+}
+
+.g-image-op {
+  bottom: 0;
+  cursor: auto;
+  position: absolute;
+}
+
+.g-image-op-content {
+  background-color: rgba(255, 255, 255, 0.6);
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+
+.g-image-op-del {
+  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .g-handler-touchable .resize-dot-n::after, .g-handler-touchable .resize-dot-s::after, .g-handler-touchable .resize-dot-w::after, .g-handler-touchable .resize-dot-e::after, .g-handler-touchable .resize-dot-nw::after, .g-handler-touchable .resize-dot-ne::after, .g-handler-touchable .resize-dot-sw::after, .g-handler-touchable .resize-dot-se::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    display: inline-block;
+    width: auto;
+    height: auto;
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+  .g-handler-touchable .resize-dot {
+    position: absolute;
+    width: auto;
+    height: auto;
+    min-width: 12px;
+    min-height: 12px;
+    border-radius: 2px;
+    background: white;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+  }
+  .g-handler-touchable .resize-dot-n {
+    position: absolute;
+    cursor: n-resize;
+    height: 12px;
+    top: -6px;
+    left: 40%;
+    right: 40%;
+  }
+  .g-handler-touchable .resize-dot-n::after {
+    line-height: 12px;
+    border-top: 5px dotted white;
+    border-bottom: 5px dotted white;
+  }
+  .g-handler-touchable .resize-dot-s {
+    position: absolute;
+    cursor: s-resize;
+    height: 12px;
+    bottom: -6px;
+    left: 40%;
+    right: 40%;
+  }
+  .g-handler-touchable .resize-dot-s::after {
+    line-height: 12px;
+    border-top: 5px dotted white;
+    border-bottom: 5px dotted white;
+  }
+  .g-handler-touchable .resize-dot-w {
+    position: absolute;
+    cursor: w-resize;
+    width: 12px;
+    left: -6px;
+    top: 40%;
+    bottom: 40%;
+  }
+  .g-handler-touchable .resize-dot-w::after {
+    line-height: 12px;
+    border-left: 5px dotted white;
+    border-right: 5px dotted white;
+  }
+  .g-handler-touchable .resize-dot-e {
+    position: absolute;
+    cursor: e-resize;
+    width: 12px;
+    right: -6px;
+    top: 40%;
+    bottom: 40%;
+  }
+  .g-handler-touchable .resize-dot-e::after {
+    line-height: 12px;
+    border-left: 5px dotted white;
+    border-right: 5px dotted white;
+  }
+  .g-handler-touchable .resize-dot-nw::after, .g-handler-touchable .resize-dot-ne::after, .g-handler-touchable .resize-dot-sw::after, .g-handler-touchable .resize-dot-se::after {
+    line-height: 12px;
+    border-top: 5px dotted white;
+    border-bottom: 5px dotted white;
+  }
+  .g-handler-touchable .resize-dot-nw {
+    position: absolute;
+    cursor: nw-resize;
+    width: 12px;
+    height: 12px;
+    margin-top: -6px;
+    margin-left: -6px;
+  }
+  .g-handler-touchable .resize-dot-ne {
+    position: absolute;
+    cursor: ne-resize;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    margin-top: -6px;
+    margin-right: -6px;
+  }
+  .g-handler-touchable .resize-dot-sw {
+    position: absolute;
+    cursor: sw-resize;
+    bottom: 0;
+    width: 12px;
+    height: 12px;
+    margin-left: -6px;
+    margin-bottom: -6px;
+  }
+  .g-handler-touchable .resize-dot-se {
+    position: absolute;
+    cursor: se-resize;
+    bottom: 0;
+    width: 12px;
+    height: 12px;
+    right: 0;
+    margin-bottom: -6px;
+    margin-right: -6px;
+  }
+  .g-handler-touchable .g-image-op-content {
+    line-height: 20px;
+    height: 20px;
+  }
+  .g-handler-touchable .g-image-op-content .g-image-op-name {
+    font-size: 12px;
+  }
+}
+/*# sourceMappingURL=bdmarker.css.map */

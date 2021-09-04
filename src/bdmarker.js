@@ -97,6 +97,9 @@ class BdAIMarker {
   #mouseEventHandler = (e, clientX, clientY) => {
     // e.preventDefault();
     // e.stopPropagation();
+    if (!this.options.editable) {
+      return
+    }
     let eventType = e.type;
     let boundRect = this.#compatibalBoundRect();
     if (clientX) {
@@ -145,8 +148,6 @@ class BdAIMarker {
       this.#actionDown = false;
     } else {
       if (this.#actionDown && this.#filterOutOfBounds(this.#moveX, this.#moveY)) {
-        // console.log(`eventType=${eventType}`);
-        // console.log(this.draftRect);
         if (this.#resizeAnnotation) {
           this.#resizeAnnotation.drawAnnotation(this.draftRect, this.#draftAnnoData);
           this.resetDraft();
@@ -154,7 +155,6 @@ class BdAIMarker {
         this.#actionDown = false;
       }
     }
-    // console.log(`eventType=${eventType}`);
   };
 
 
@@ -220,8 +220,12 @@ class BdAIMarker {
    */
   clearAll = () => {
     let annotations = this.layer.querySelectorAll(`.${this.options.annotationClass}`);
-    annotations.forEach((item) => {
-      item.remove()
+    annotations.forEach((node) => {
+      if (typeof node.remove === 'function') {
+        node.remove();
+      } else {
+        node.parentNode?.removeChild(node)
+      }
     })
     this.renderData(void 0)
   };

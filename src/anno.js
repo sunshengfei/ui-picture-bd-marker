@@ -79,7 +79,7 @@ export default class ResizeAnnotation {
                     let element = this.options.textComponent.apply(null, [opContent])
                     if (!element) {
                         //默认
-                        return
+                        break
                     }
                     if (!(element instanceof Element)) {
                         throw new Error("closeComponent not a Element")
@@ -99,7 +99,6 @@ export default class ResizeAnnotation {
         if (this.currentMovement && !this.options.editable) {
             this.currentMovement.currentNode.querySelectorAll(`[class*=${PREFIX_RESIZE_DOT}]`)
                 .forEach((node) => {
-
                     if (node.classList.contains(dotCls[8])) {
                         node.classList.remove('hidden');
                     } else {
@@ -107,7 +106,6 @@ export default class ResizeAnnotation {
                     }
                 });
         }
-
     }
 
     setConfigOptions = (newOptions) => {
@@ -128,7 +126,21 @@ export default class ResizeAnnotation {
     }
 
     isValid = (rect) => {
-        return rect && parseFloat(rect.width) > 1 && parseFloat(rect.height) > 1;
+        if (!rect) {
+            return false
+        }
+        let valid = []
+        if (/^\d*(\.\d+)?%$/.test(rect.width)) {
+            valid.push(true)
+        } else if (parseFloat(rect.width) < 1) {
+            valid.push(false)
+        }
+        if (/^\d*(\.\d+)?%$/.test(rect.height)) {
+            valid.push(true)
+        } else if (parseFloat(rect.height) < 1) {
+            valid.push(false)
+        }
+        return valid.filter(Boolean).length == valid.length;
     };
 
     renderData = (
@@ -181,10 +193,9 @@ export default class ResizeAnnotation {
         }
     };
 
-    getCurrentAnnotationData = () => {
-
-        //  todo
-    }
+    // getCurrentAnnotationData = () => {
+    //     //  todo
+    // }
 
 
     setTagForCurrentMovement = (tagOb) => {
@@ -269,7 +280,12 @@ export default class ResizeAnnotation {
                 }
             }
             this.config.onUpdated(this.dataSource());
-            node.remove();
+            if (typeof node.remove === 'function') {
+                node.remove();
+            } else {
+                node.parentNode?.removeChild(node)
+            }
+
         }
     }
 
