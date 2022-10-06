@@ -27,7 +27,7 @@
   "devDependencies": {
     "@babel/core": "^7.12.10",
     "@babel/preset-env": "^7.12.1",
-    "snyk": "^1.91.0"
+    "snyk": "^1.996.0"
   },
   "files": [
     "index.js",
