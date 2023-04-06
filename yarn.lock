@@ -1186,10 +1186,10 @@ semver@^6.1.1, semver@^6.1.2, semver@^6.3.0:
   resolved "https://registry.npmjs.org/semver/-/semver-6.3.0.tgz#ee0a64c8af5e8ceea67687b133761e1becbd1d3d"
   integrity sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==
 
-snyk@^1.91.0:
-  version "1.696.0"
-  resolved "https://registry.npmjs.org/snyk/-/snyk-1.696.0.tgz#096998efd8be757a6093ac354ccc1628db2c4373"
-  integrity sha512-0ZTIc2RAfh6dD+KCegJe65AIzEpm6RBIvbPcnQXmGe/lf1GsmwxWO8GALvWnAmDPNHIBSdjq+a6ijF5VoxdKAA==
+snyk@^1.1064.0:
+  version "1.1064.0"
+  resolved "https://registry.yarnpkg.com/snyk/-/snyk-1.1064.0.tgz#e73b3a1aff585f6266f73ddd498c5cfd5e67aff0"
+  integrity sha512-f9mNO5rUc5nVVZ1sN+do2i5/RGHKlOQoNk5HiEO9WkPEn2pFllJv2XAw5Bn7sFj1eLXNFVUOUlo6SVqGnX7lXw==
 
 source-map@^0.5.0:
   version "0.5.7"
