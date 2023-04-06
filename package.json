@@ -1,6 +1,6 @@
 {
   "name": "@sunshengfei/ui-picture-bd-marker",
-  "version": "2.3.7",
+  "version": "2.3.8",
   "description": "高仿百度AI图像物体检测标注控件",
   "main": "index.js",
   "scripts": {

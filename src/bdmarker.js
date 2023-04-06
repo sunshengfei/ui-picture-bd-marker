@@ -97,10 +97,15 @@ class BdAIMarker {
   #mouseEventHandler = (e, clientX, clientY) => {
     // e.preventDefault();
     // e.stopPropagation();
-    if (!this.options.editable) {
+    const readOnlyAccept = !this.options.editable && !this.options.readOnlyCanSelected
+    const readOnlyButAccept = !this.options.editable && this.options.readOnlyCanSelected
+    if (readOnlyAccept) {
       return
     }
     let eventType = e.type;
+    if (readOnlyButAccept && !this.options.readOnlyAcceptEvent.includes(eventType)) {
+      return
+    }
     let boundRect = this.#compatibalBoundRect();
     if (clientX) {
       this.#moveX = clientX - boundRect.x;

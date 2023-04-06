@@ -15,7 +15,17 @@ npm install ui-picture-bd-marker -D
 
 源码仓库：[https://github.com/sunshengfei/ui-picture-bd-marker](https://github.com/sunshengfei/ui-picture-bd-marker)
 
-文档地址 ：[https://vmarker.sagocloud.com/diy/](https://vmarker.sagocloud.com/diy/#upbm)
+文档服务器欠费，暂无文档
+
+### ver2.3.8
+
+1. 增加只读模式选中
+默认值
+```
+readOnlyCanSelected: true,
+readOnlyAcceptEvent: ['mousedown', 'mouseup', 'touchstart', 'touchup']
+```
+
 
 ### ver2.3.7
 

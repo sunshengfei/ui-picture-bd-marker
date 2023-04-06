@@ -30,6 +30,8 @@ export const defaultConfig = {
         blurOtherDots: false,
         blurOtherDotsShowTags: false,
         editable: true,
+        readOnlyCanSelected: true,
+        readOnlyAcceptEvent: ['mousedown', 'mouseup', 'touchstart', 'touchup'],
         showTags: true,
         closable: true,
         supportDelKey: false,

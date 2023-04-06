@@ -109,10 +109,17 @@ export default class ResizeAnnotation {
     }
 
     setConfigOptions = (newOptions) => {
+        const oldEditable = this.options.editable
         this.options = { ...this.options, ...newOptions.options }
+        const newOldEditable = this.options.editable
         this.config = { ...this.config, ...newOptions }
         this.#event()
         this.#uiconstruct()
+        if (!oldEditable && oldEditable != newOldEditable) {
+            if (this.currentMovement) {
+                this.selectAnnotation(false)
+            }
+        }
     }
 
     //获取数据模板
@@ -486,6 +493,14 @@ export default class ResizeAnnotation {
         if (this.currentMovement) {
             let cs = this.currentMovement.currentNode.classList;
             cs.add('selected');
+            const node = this.currentMovement.currentNode;
+            // const ln = node.querySelector(`.${imageOpTag}`);
+            // const tag_str = ln.innerText;
+            // const tagAttr = ln.dataset;
+            let selectData = {
+                ...this.currentMovement.data
+                // ...this.dataSourceOfTag(tagAttr.id, node.dataset.uuid),
+            }
             if (this.options.blurOtherDots) {
                 if (!this.options.editable) {
                     this.currentMovement.currentNode.querySelectorAll(`[class*=${PREFIX_RESIZE_DOT}]`)
@@ -496,6 +511,10 @@ export default class ResizeAnnotation {
                                 node.classList.add('hidden');
                             }
                         });
+                    if (this.options.readOnlyCanSelected) {
+                        this.config.onAnnoSelected(selectData, node)
+                    }
+
                     return;
                 }
                 this.currentMovement.currentNode.querySelectorAll(`[class*=${PREFIX_RESIZE_DOT}]`)
@@ -504,14 +523,6 @@ export default class ResizeAnnotation {
                     });
             }
             if (!isUserinteracted) return;
-            const node = this.currentMovement.currentNode;
-            // const ln = node.querySelector(`.${imageOpTag}`);
-            // const tag_str = ln.innerText;
-            // const tagAttr = ln.dataset;
-            let selectData = {
-                ...this.currentMovement.data
-                // ...this.dataSourceOfTag(tagAttr.id, node.dataset.uuid),
-            }
             this.config.onAnnoSelected(selectData, node)
         }
     };
